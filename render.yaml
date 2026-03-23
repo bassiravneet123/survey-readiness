@@ -2,9 +2,12 @@ services:
   - type: web
     name: survey-readiness
     runtime: python
+    region: oregon
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:app
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
     plan: free
     envVars:
       - key: PORT
-        value: 10000
+        value: "10000"
+      - key: PYTHON_VERSION
+        value: "3.11.6"
