@@ -617,7 +617,7 @@
 <!-- ===== PRINT REPORT CONTAINER ===== -->
 <div id="printReport"></div>
 
-<script>
+{% raw %}<script>
 const STORAGE_KEY = 'cms20077_state';
 
 // ===== Tag Database =====
@@ -1092,4 +1092,26 @@ function downloadReportHTML() {
   .sig-line { flex: 1; border-top: 1px solid #000; padding-top: 4px; font-size: 9pt; text-align: center; }
   .watermark { text-align: center; font-size: 8pt; color: #999; margin-top: 20px; border-top: 1px solid #ddd; padding-top: 8px; }
   @media print { body { margin: 0; padding: 15px; } }
-</style></head><body>${content}</body></html>
+</style></head><body>${content}</body></html>`;
+  const blob = new Blob([full], { type: 'text/html' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'CMS-2567_Physical_Restraints_' + new Date().toISOString().slice(0,10) + '.html';
+  a.click();
+}
+
+// Auto-load
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) { try { loadState(JSON.parse(saved)); } catch(e) {} }
+  updateProgress();
+});
+
+document.addEventListener('change', (e) => {
+  if (e.target.type === 'checkbox') {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(getState()));
+  }
+});
+</script>{% endraw %}
+</body>
+</html>

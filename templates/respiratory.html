@@ -441,7 +441,7 @@
 
 <div id="printReport"></div>
 
-<script>
+{% raw %}<script>
 const STORAGE_KEY = 'cms20081_state';
 
 const TAG_DB = {
@@ -671,4 +671,26 @@ function generateAndDownloadHTML() { downloadReportHTML(); closeReportModal(); }
 function downloadReportHTML() {
   const content = buildReportHTML();
   const full = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Facility Survey Readiness Assessment - CMS-2567 Respiratory Care</title>
-<style>body{font-family:"Times New Roman",Times,serif;font-size:11pt;color:#000;max-width:850px;margin:30px auto;padding:20px}h1{text-align:center;font-size:14pt;margin-bottom:2px;text-transform:uppercase}h2{text-align:center;font-size:12pt;margin-bottom:16px;font-weight:normal}.report-meta-table{width:100%;border-collapse:collapse;margin-bottom:20px;font-size:10pt}.report-meta-table td{border:1px solid #000;padding:4px 8px;vertical-align:top}.report-meta-table .label{font-weight:bold;background:#f0f0f0;width:180px}.deficiency-section{margin-bottom:24px;page-break-inside:avoid}.deficiency-section h3{font-size:12pt;border-bottom:2px solid #000;padding-bottom:4px;margin-bottom:10px}.finding-block{margin-bottom:16px;padding:10px 14px;border-left:3px solid #c0392b;background:#fafafa}.finding-block .tag-label{font-weight:bold;font-size:11pt;color:#c0392b;margin-bottom:4px}.finding-block p{margin:4px 0;font-size:10.5pt;line-height:1.5}.plan-section{margin-top:8px;padding-top:8px;border-top:1px dashed #aaa}.plan-section .plan-label{font-weight:bold;font-size:10pt}.summary-table{width:100%;border-collapse:collapse;margin:12px 0;font-size:10pt}.summary-table th,.summary-table td{border:1px solid #000;padding:6px 10px;text-align:left}.summary-table th{background:#e8e8e8;font-weight:bold}.summary-table .fail{color:#c0392b;font-weight:bold}.summary-table .pass{color:#27ae60}.signature-block{margin-top:40px;display:flex;justify-content:space-between;gap:40px}.sig-line{flex:1;border-top:1px solid #000;padding-top:4px;font-size:9pt;text-align:center}.watermark{text-align:center;font-size:8pt;color:#999;margin-top:20px;border-top:1px solid #ddd;padding-top:8px}@media print{body{margin:0;padding:15px}}</style></head><body>${content}</body></html>
+<style>body{font-family:"Times New Roman",Times,serif;font-size:11pt;color:#000;max-width:850px;margin:30px auto;padding:20px}h1{text-align:center;font-size:14pt;margin-bottom:2px;text-transform:uppercase}h2{text-align:center;font-size:12pt;margin-bottom:16px;font-weight:normal}.report-meta-table{width:100%;border-collapse:collapse;margin-bottom:20px;font-size:10pt}.report-meta-table td{border:1px solid #000;padding:4px 8px;vertical-align:top}.report-meta-table .label{font-weight:bold;background:#f0f0f0;width:180px}.deficiency-section{margin-bottom:24px;page-break-inside:avoid}.deficiency-section h3{font-size:12pt;border-bottom:2px solid #000;padding-bottom:4px;margin-bottom:10px}.finding-block{margin-bottom:16px;padding:10px 14px;border-left:3px solid #c0392b;background:#fafafa}.finding-block .tag-label{font-weight:bold;font-size:11pt;color:#c0392b;margin-bottom:4px}.finding-block p{margin:4px 0;font-size:10.5pt;line-height:1.5}.plan-section{margin-top:8px;padding-top:8px;border-top:1px dashed #aaa}.plan-section .plan-label{font-weight:bold;font-size:10pt}.summary-table{width:100%;border-collapse:collapse;margin:12px 0;font-size:10pt}.summary-table th,.summary-table td{border:1px solid #000;padding:6px 10px;text-align:left}.summary-table th{background:#e8e8e8;font-weight:bold}.summary-table .fail{color:#c0392b;font-weight:bold}.summary-table .pass{color:#27ae60}.signature-block{margin-top:40px;display:flex;justify-content:space-between;gap:40px}.sig-line{flex:1;border-top:1px solid #000;padding-top:4px;font-size:9pt;text-align:center}.watermark{text-align:center;font-size:8pt;color:#999;margin-top:20px;border-top:1px solid #ddd;padding-top:8px}@media print{body{margin:0;padding:15px}}</style></head><body>${content}</body></html>`;
+  const blob = new Blob([full], { type: 'text/html' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'CMS-2567_Respiratory_Care_' + new Date().toISOString().slice(0,10) + '.html';
+  a.click();
+}
+
+// Auto-load
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) { try { loadState(JSON.parse(saved)); } catch(e) {} }
+  updateProgress();
+});
+
+document.addEventListener('change', (e) => {
+  if (e.target.type === 'checkbox') {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(getState()));
+  }
+});
+</script>{% endraw %}
+</body>
+</html>
