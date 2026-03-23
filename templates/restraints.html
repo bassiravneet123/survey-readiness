@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Facility Survey Readiness Assessment - CMS-20077 Physical Restraints</title>
+<style>
+  :root {
+    --primary: #1a5276;
+    --primary-light: #2980b9;
+    --accent: #e74c3c;
+    --success: #27ae60;
+    --warning: #f39c12;
+    --bg: #f5f7fa;
+    --card-bg: #ffffff;
+    --text: #2c3e50;
+    --text-light: #7f8c8d;
+    --border: #dce1e8;
+    --shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.6;
+  }
+  .header {
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    color: white; padding: 24px 32px; position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+  }
+  .header h1 { font-size: 1.4rem; font-weight: 600; }
+  .header .subtitle { font-size: 0.9rem; opacity: 0.85; margin-top: 4px; }
+  .progress-bar-container {
+    background: rgba(255,255,255,0.2); border-radius: 8px; height: 8px; margin-top: 12px; overflow: hidden;
+  }
+  .progress-bar {
+    background: var(--success); height: 100%; border-radius: 8px; transition: width 0.4s ease; width: 0%;
+  }
+  .progress-text { font-size: 0.8rem; margin-top: 4px; opacity: 0.9; }
+  .container { max-width: 960px; margin: 0 auto; padding: 24px 16px 80px; }
+  .nav-tabs {
+    display: flex; gap: 4px; margin-bottom: 24px; overflow-x: auto;
+    padding-bottom: 4px; -webkit-overflow-scrolling: touch;
+  }
+  .nav-tab {
+    padding: 10px 16px; border: none; background: var(--card-bg); color: var(--text-light);
+    font-size: 0.85rem; font-weight: 500; border-radius: 8px 8px 0 0; cursor: pointer;
+    white-space: nowrap; transition: all 0.2s; border-bottom: 3px solid transparent;
+  }
+  .nav-tab:hover { color: var(--primary); }
+  .nav-tab.active {
+    color: var(--primary); border-bottom-color: var(--primary);
+    background: var(--card-bg); box-shadow: var(--shadow);
+  }
+  .nav-tab .tab-badge {
+    display: inline-block; background: var(--border); color: var(--text-light);
+    font-size: 0.7rem; padding: 1px 6px; border-radius: 10px; margin-left: 6px;
+  }
+  .nav-tab.active .tab-badge { background: var(--primary-light); color: white; }
+  .nav-tab .tab-badge.complete { background: var(--success); color: white; }
+  .section { display: none; }
+  .section.active { display: block; }
+  .card {
+    background: var(--card-bg); border-radius: 12px; box-shadow: var(--shadow);
+    margin-bottom: 16px; overflow: hidden; border: 1px solid var(--border);
+  }
+  .card-header {
+    padding: 16px 20px; cursor: pointer; display: flex; align-items: center;
+    gap: 12px; user-select: none; transition: background 0.2s;
+  }
+  .card-header:hover { background: #f8f9fb; }
+  .card-header .arrow { font-size: 0.7rem; transition: transform 0.3s; color: var(--text-light); }
+  .card-header.open .arrow { transform: rotate(90deg); }
+  .card-header h3 { font-size: 1rem; font-weight: 600; flex: 1; }
+  .card-body { display: none; padding: 0 20px 20px; }
+  .card-body.open { display: block; }
+  .checklist-item {
+    display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid #f0f2f5; align-items: flex-start;
+  }
+  .checklist-item:last-child { border-bottom: none; }
+  .checklist-item input[type="checkbox"] {
+    width: 20px; height: 20px; margin-top: 2px; flex-shrink: 0; accent-color: var(--primary); cursor: pointer;
+  }
+  .checklist-item label { font-size: 0.92rem; cursor: pointer; flex: 1; }
+  .checklist-item.checked label { color: var(--text-light); text-decoration: line-through; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 768px) {
+    .two-col { grid-template-columns: 1fr; }
+    .nav-tabs { gap: 2px; }
+    .nav-tab { padding: 8px 12px; font-size: 0.8rem; }
+  }
+  .two-col .col { background: #f8f9fb; border-radius: 8px; padding: 16px; }
+  .decision-block {
+    background: var(--card-bg); border-radius: 12px; box-shadow: var(--shadow);
+    border: 1px solid var(--border); margin-bottom: 16px; padding: 20px;
+  }
+  .decision-block .question { font-size: 0.95rem; font-weight: 500; margin-bottom: 12px; line-height: 1.5; }
+  .decision-buttons { display: flex; gap: 8px; margin-bottom: 8px; }
+  .decision-btn {
+    padding: 8px 24px; border: 2px solid var(--border); border-radius: 8px;
+    background: white; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.2s;
+  }
+  .decision-btn:hover { border-color: var(--primary-light); }
+  .decision-btn.yes.selected { background: var(--success); color: white; border-color: var(--success); }
+  .decision-btn.no.selected { background: var(--accent); color: white; border-color: var(--accent); }
+  .decision-btn.na.selected { background: var(--text-light); color: white; border-color: var(--text-light); }
+  .citation {
+    margin-top: 10px; padding: 10px 14px; background: #fdf0ef; border-left: 4px solid var(--accent);
+    border-radius: 4px; font-size: 0.88rem; font-weight: 600; color: var(--accent); display: none;
+  }
+  .citation.show { display: block; }
+  .na-note {
+    margin-top: 8px; padding: 10px 14px; background: #f5f5f5; border-left: 4px solid var(--text-light);
+    border-radius: 4px; font-size: 0.85rem; color: var(--text-light); display: none;
+  }
+  .na-note.show { display: block; }
+  .notes-area { margin-top: 12px; }
+  .notes-area textarea {
+    width: 100%; min-height: 60px; border: 1px solid var(--border); border-radius: 8px;
+    padding: 10px; font-family: inherit; font-size: 0.88rem; resize: vertical; transition: border-color 0.2s;
+  }
+  .notes-area textarea:focus { outline: none; border-color: var(--primary-light); }
+  .notes-area textarea::placeholder { color: #bbb; }
+  .info-box {
+    background: #eaf2f8; border-left: 4px solid var(--primary-light); border-radius: 4px;
+    padding: 14px 18px; margin-bottom: 16px; font-size: 0.9rem;
+  }
+  .info-box.warning { background: #fef9e7; border-left-color: var(--warning); }
+  .section-title {
+    font-size: 1.1rem; font-weight: 700; color: var(--primary); margin-bottom: 16px;
+    padding-bottom: 8px; border-bottom: 2px solid var(--primary-light);
+  }
+  .floating-actions { position: fixed; bottom: 20px; right: 20px; display: flex; gap: 8px; z-index: 50; }
+  .fab {
+    padding: 12px 20px; border: none; border-radius: 25px; font-size: 0.85rem; font-weight: 600;
+    cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: all 0.2s;
+  }
+  .fab:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.2); }
+  .fab.save { background: var(--primary); color: white; }
+  .fab.reset { background: white; color: var(--text); border: 1px solid var(--border); }
+  .fab.export { background: var(--success); color: white; }
+  .fab.report { background: var(--accent); color: white; }
+  .toast {
+    position: fixed; bottom: 80px; right: 20px; background: var(--text); color: white;
+    padding: 12px 20px; border-radius: 8px; font-size: 0.88rem; opacity: 0;
+    transform: translateY(10px); transition: all 0.3s; z-index: 200;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  /* ===== REPORT MODAL ===== */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+    z-index: 500; justify-content: center; align-items: center;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: white; border-radius: 16px; width: 95%; max-width: 700px;
+    max-height: 90vh; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    display: flex; flex-direction: column;
+  }
+  .modal-header {
+    padding: 20px 24px; border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .modal-header h2 { font-size: 1.15rem; color: var(--primary); }
+  .modal-close {
+    background: none; border: none; font-size: 1.5rem; cursor: pointer;
+    color: var(--text-light); padding: 4px 8px; border-radius: 6px;
+  }
+  .modal-close:hover { background: #f0f0f0; }
+  .modal-body { padding: 24px; overflow-y: auto; flex: 1; }
+  .modal-footer {
+    padding: 16px 24px; border-top: 1px solid var(--border);
+    display: flex; gap: 8px; justify-content: flex-end;
+  }
+  .modal-btn {
+    padding: 10px 24px; border-radius: 8px; font-size: 0.9rem; font-weight: 600;
+    cursor: pointer; border: 1px solid var(--border); transition: all 0.2s;
+  }
+  .modal-btn.primary { background: var(--accent); color: white; border-color: var(--accent); }
+  .modal-btn.primary:hover { background: #c0392b; }
+  .modal-btn.secondary { background: var(--primary); color: white; border-color: var(--primary); }
+  .modal-btn.secondary:hover { background: #154360; }
+  .modal-btn.ghost { background: white; color: var(--text); }
+  .modal-btn.ghost:hover { background: #f5f5f5; }
+
+  .form-group { margin-bottom: 18px; }
+  .form-group label { display: block; font-weight: 600; font-size: 0.88rem; margin-bottom: 6px; color: var(--text); }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px;
+    font-family: inherit; font-size: 0.9rem; transition: border-color 0.2s;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    outline: none; border-color: var(--primary-light);
+  }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
+
+  .deficiency-preview {
+    background: #fdf0ef; border: 1px solid #f5c6cb; border-radius: 8px;
+    padding: 12px 16px; margin-top: 12px; font-size: 0.85rem;
+  }
+  .deficiency-preview .tag-num { font-weight: 700; color: var(--accent); }
+
+  /* ===== PRINT-ONLY REPORT ===== */
+  @media print {
+    body * { visibility: hidden; }
+    #printReport, #printReport * { visibility: visible; }
+    #printReport {
+      position: absolute; left: 0; top: 0; width: 100%;
+      font-family: "Times New Roman", Times, serif; font-size: 11pt; color: #000;
+    }
+    .no-print { display: none !important; }
+  }
+
+  #printReport {
+    display: none; font-family: "Times New Roman", Times, serif; color: #000; font-size: 11pt;
+  }
+  #printReport.visible {
+    display: block; background: white; padding: 40px; max-width: 850px; margin: 20px auto;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1); border: 1px solid #ccc;
+  }
+  #printReport h1 { text-align: center; font-size: 14pt; margin-bottom: 2px; text-transform: uppercase; }
+  #printReport h2 { text-align: center; font-size: 12pt; margin-bottom: 16px; font-weight: normal; }
+  #printReport .report-meta-table {
+    width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 10pt;
+  }
+  #printReport .report-meta-table td {
+    border: 1px solid #000; padding: 4px 8px; vertical-align: top;
+  }
+  #printReport .report-meta-table .label { font-weight: bold; background: #f0f0f0; width: 180px; }
+  #printReport .deficiency-section { margin-bottom: 24px; page-break-inside: avoid; }
+  #printReport .deficiency-section h3 {
+    font-size: 12pt; border-bottom: 2px solid #000; padding-bottom: 4px; margin-bottom: 10px;
+  }
+  #printReport .finding-block {
+    margin-bottom: 16px; padding: 10px 14px; border-left: 3px solid #c0392b; background: #fafafa;
+  }
+  #printReport .finding-block .tag-label {
+    font-weight: bold; font-size: 11pt; color: #c0392b; margin-bottom: 4px;
+  }
+  #printReport .finding-block p { margin: 4px 0; font-size: 10.5pt; line-height: 1.5; }
+  #printReport .plan-section { margin-top: 8px; padding-top: 8px; border-top: 1px dashed #aaa; }
+  #printReport .plan-section .plan-label { font-weight: bold; font-size: 10pt; }
+  #printReport .summary-table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 10pt; }
+  #printReport .summary-table th, #printReport .summary-table td {
+    border: 1px solid #000; padding: 6px 10px; text-align: left;
+  }
+  #printReport .summary-table th { background: #e8e8e8; font-weight: bold; }
+  #printReport .summary-table .fail { color: #c0392b; font-weight: bold; }
+  #printReport .summary-table .pass { color: #27ae60; }
+  #printReport .signature-block {
+    margin-top: 40px; display: flex; justify-content: space-between; gap: 40px;
+  }
+  #printReport .sig-line {
+    flex: 1; border-top: 1px solid #000; padding-top: 4px; font-size: 9pt; text-align: center;
+  }
+  #printReport .watermark {
+    text-align: center; font-size: 8pt; color: #999; margin-top: 20px; border-top: 1px solid #ddd; padding-top: 8px;
+  }
+</style>
+</head>
+<body>
+
+<div class="header" id="mainHeader">
+  <div class="subtitle" style="font-size:0.8rem;opacity:0.7;margin-bottom:4px;letter-spacing:1px;text-transform:uppercase">Facility Survey Readiness Assessment</div>
+  <h1>CMS-20077 Physical Restraints</h1>
+  <div class="subtitle">Long-Term Care Survey Pathway &mdash; Interactive Checklist</div>
+  <div class="progress-bar-container">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+  <div class="progress-text" id="progressText">0 of 0 items completed (0%)</div>
+</div>
+
+<div class="container" id="mainApp">
+
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showSection('trigger', this)">When to Use <span class="tab-badge" id="badge-trigger">0/4</span></button>
+    <button class="nav-tab" onclick="showSection('advance', this)">Advance Review <span class="tab-badge" id="badge-advance">0/3</span></button>
+    <button class="nav-tab" onclick="showSection('observations', this)">Observations <span class="tab-badge" id="badge-observations">0/13</span></button>
+    <button class="nav-tab" onclick="showSection('resident', this)">Resident Interview <span class="tab-badge" id="badge-resident">0/10</span></button>
+    <button class="nav-tab" onclick="showSection('staff', this)">Staff Interview <span class="tab-badge" id="badge-staff">0/18</span></button>
+    <button class="nav-tab" onclick="showSection('record', this)">Record Review <span class="tab-badge" id="badge-record">0/14</span></button>
+    <button class="nav-tab" onclick="showSection('decisions', this)">Decisions <span class="tab-badge" id="badge-decisions">0/11</span></button>
+  </div>
+
+  <!-- ===== SECTION: When to Use ===== -->
+  <div class="section active" id="section-trigger">
+    <div class="section-title">Use this pathway:</div>
+    <div class="card"><div class="card-body open">
+      <div class="checklist-item" data-section="trigger"><input type="checkbox" id="t1" onchange="updateProgress()"><label for="t1">When a resident's clinical record reflects the use of a physical restraint</label></div>
+      <div class="checklist-item" data-section="trigger"><input type="checkbox" id="t2" onchange="updateProgress()"><label for="t2">If the survey team observes a position change alarm or device or practice that restricts or potentially restricts a resident's freedom of movement</label></div>
+      <div class="checklist-item" data-section="trigger"><input type="checkbox" id="t3" onchange="updateProgress()"><label for="t3">If the resident or other individuals report that a restraint is being used on the resident</label></div>
+      <div class="checklist-item" data-section="trigger"><input type="checkbox" id="t4" onchange="updateProgress()"><label for="t4">If an allegation of inappropriate use of a physical restraint is received</label></div>
+    </div></div>
+    <div class="info-box warning"><strong>NOTE:</strong> For concerns related to involuntary seclusion, see the Investigative Protocol under Tag F603.</div>
+  </div>
+
+  <!-- ===== SECTION: Advance Review ===== -->
+  <div class="section" id="section-advance">
+    <div class="section-title">Review the Following in Advance to Guide Observations and Interviews</div>
+    <div class="card"><div class="card-body open">
+      <div class="checklist-item" data-section="advance"><input type="checkbox" id="a1" onchange="updateProgress()"><label for="a1">The most current comprehensive and most recent quarterly MDS/CAAs for Sections C, E, GG, J, and P</label></div>
+      <div class="checklist-item" data-section="advance"><input type="checkbox" id="a2" onchange="updateProgress()"><label for="a2">Practitioner's orders (e.g., medical symptom being treated, type of restraint, frequency of releasing)</label></div>
+      <div class="checklist-item" data-section="advance"><input type="checkbox" id="a3" onchange="updateProgress()"><label for="a3">Care plan (e.g., medical symptoms justifying use, type, frequency, duration, circumstances, interventions for complications)</label></div>
+    </div></div>
+  </div>
+
+  <!-- ===== SECTION: Observations ===== -->
+  <div class="section" id="section-observations">
+    <div class="section-title">Observations</div>
+    <div class="info-box">If use of a device is indicated in the care plan, observe how care-planned interventions are implemented.</div>
+    <div class="card">
+      <div class="card-header open" onclick="toggleCard(this)"><span class="arrow">&#9654;</span><h3>Restraint Use Observations</h3></div>
+      <div class="card-body open">
+        <div class="checklist-item" data-section="observations"><input type="checkbox" id="o1" onchange="updateProgress()"><label for="o1">Is the resident's movement restricted? If so, describe. When was the method used, by whom, and how did staff communicate?</label></div>
+        <div class="checklist-item" data-section="observations"><input type="checkbox" id="o2" onchange="updateProgress()"><label for="o2">Check: Chair or bed placed close to wall preventing resident from rising</label></div>
+        <div class="checklist-item" data-section="observations"><input type="checkbox" id="o3" onchange="updateProgress()"><label for="o3">Check: Sheet/fabric/clothing tucked tightly restricting freedom of movement</label></div>
+        <div class="checklist-item" data-section="observations"><input type="checkbox" id="o4" onchange="updateProgress()"><label for="o4">Check: Resident placed in chair (beanbag/recliner) preventing independent rising</label></div>
+        <div class="checklist-item" data-section="observations"><input type="checkbox" id="o5" onchange="updateProgress()"><label for="o5">Check: Devices used with chair (trays, tables, cushions, bars, belts) resident cannot remove</label></div>
+        <div class="checklist-item" data-section="observations"><input type="checkbox" id="o6" onchange="updateProgress()"><label for="o6">Check: Resident being held down during behavioral symptom or provision of care</label></div>
+        <div class="checklist-item" data-section="observations"><input type="checkbox" id="o7" onchange="updateProgress()"><label for="o7">How does the resident request staff assistance? (call light, calling out, grabbing staff)</label></div>
+        <div class="checklist-item" data-section="observations"><input type="checkbox" id="o8" onchange="updateProgress()"><label for="o8">How does staff respond to the resident?</label></div>
+        <div class="checklist-item" data-section="observations"><input type="checkbox" id="o9" onchange="updateProgress()"><label for="o9">How often are staff monitoring the resident?</label></div>
+        <div class="checklist-item" data-section="observations"><input type="checkbox" id="o10" onchange="updateProgress()"><label for="o10">How often is the resident taken to the bathroom, ambulated, or provided exercises/ROM?</label></div>
+        <div class="checklist-item" data-section="observations"><input type="checkbox" id="o11" onchange="updateProgress()"><label for="o11">When the restraint is released: who released it, for how long, and how often?</label></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header" onclick="toggleCard(this)"><span class="arrow">&#9654;</span><h3>Discipline / Convenience &amp; Reactions</h3></div>
+      <div class="card-body">
+        <div class="checklist-item" data-section="observations"><input type="checkbox" id="o12" onchange="updateProgress()"><label for="o12">Is the restraint used for discipline or staff convenience?</label></div>
+        <div class="checklist-item" data-section="observations"><input type="checkbox" id="o13" onchange="updateProgress()"><label for="o13">Are there physical/psychosocial reactions? (pulling, anger, calling for help, fear of alarm)</label></div>
+        <div class="notes-area"><textarea placeholder="Notes on observations..." data-note="observations-notes" onchange="saveNotes()"></textarea></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SECTION: Resident Interview ===== -->
+  <div class="section" id="section-resident">
+    <div class="section-title">Resident, Resident Representative, or Family Interview</div>
+    <div class="info-box warning">When conducting interviews, describe the device/practice instead of using the term "restraint" since the interviewee may not recognize that a restraint was/is being used.<br><br><strong>Safety Note:</strong> Do not request that the resident remove the restraint. Request that staff ask the resident to demonstrate removal without specific instructions.</div>
+    <div class="two-col">
+      <div class="col">
+        <div class="checklist-item" data-section="resident"><input type="checkbox" id="r1" onchange="updateProgress()"><label for="r1">Can you explain why you have the device?</label></div>
+        <div class="checklist-item" data-section="resident"><input type="checkbox" id="r2" onchange="updateProgress()"><label for="r2">Who requested the device and why?</label></div>
+        <div class="checklist-item" data-section="resident"><input type="checkbox" id="r3" onchange="updateProgress()"><label for="r3">Prior to use, did staff provide info re: why, risks/benefits, effects on mobility/ADLs, when/how long?</label></div>
+        <div class="checklist-item" data-section="resident"><input type="checkbox" id="r4" onchange="updateProgress()"><label for="r4">What was tried before the device was used (less restrictive alternatives)?</label></div>
+        <div class="checklist-item" data-section="resident"><input type="checkbox" id="r5" onchange="updateProgress()"><label for="r5">How were you involved in the care plan? Does it reflect your choices and preferences?</label></div>
+      </div>
+      <div class="col">
+        <div class="checklist-item" data-section="resident"><input type="checkbox" id="r6" onchange="updateProgress()"><label for="r6">How do you contact staff when the device is used? How does staff respond?</label></div>
+        <div class="checklist-item" data-section="resident"><input type="checkbox" id="r7" onchange="updateProgress()"><label for="r7">If position change alarm in use: why? How does it make you feel? Does it change how you move?</label></div>
+        <div class="checklist-item" data-section="resident"><input type="checkbox" id="r8" onchange="updateProgress()"><label for="r8">Have you had any problems when the device is being used?</label></div>
+        <div class="checklist-item" data-section="resident"><input type="checkbox" id="r9" onchange="updateProgress()"><label for="r9">For representative: if restraint used in imminent danger, when did staff notify you?</label></div>
+        <div class="checklist-item" data-section="resident"><input type="checkbox" id="r10" onchange="updateProgress()"><label for="r10">What did staff tell you about type/method? Did they explain when it would be discontinued?</label></div>
+      </div>
+    </div>
+    <div class="notes-area" style="margin-top:16px"><textarea placeholder="Interview notes..." data-note="resident-notes" onchange="saveNotes()"></textarea></div>
+  </div>
+
+  <!-- ===== SECTION: Staff Interview ===== -->
+  <div class="section" id="section-staff">
+    <div class="section-title">Staff Interviews (Nursing Aides, Nurses, DON)</div>
+    <div class="info-box warning">When conducting interviews, describe the device/practice instead of using the term "restraint."</div>
+    <div class="two-col">
+      <div class="col">
+        <h4 style="margin-bottom:12px;color:var(--primary)">General Staff Questions</h4>
+        <div class="checklist-item" data-section="staff"><input type="checkbox" id="s1" onchange="updateProgress()"><label for="s1">Why is this device being used for this resident?</label></div>
+        <div class="checklist-item" data-section="staff"><input type="checkbox" id="s2" onchange="updateProgress()"><label for="s2">Have you had any training on the use of the device?</label></div>
+        <div class="checklist-item" data-section="staff"><input type="checkbox" id="s3" onchange="updateProgress()"><label for="s3">How has the use of this device impacted how you provide care?</label></div>
+        <div class="checklist-item" data-section="staff"><input type="checkbox" id="s4" onchange="updateProgress()"><label for="s4">When did the use begin? What is the rationale (medical symptoms)?</label></div>
+        <div class="checklist-item" data-section="staff"><input type="checkbox" id="s5" onchange="updateProgress()"><label for="s5">What are the risks and benefits of using the device?</label></div>
+        <div class="checklist-item" data-section="staff"><input type="checkbox" id="s6" onchange="updateProgress()"><label for="s6">What measures were attempted before the device was started?</label></div>
+        <div class="checklist-item" data-section="staff"><input type="checkbox" id="s7" onchange="updateProgress()"><label for="s7">How often is the device applied, for how long, under what circumstances?</label></div>
+        <div class="checklist-item" data-section="staff"><input type="checkbox" id="s8" onchange="updateProgress()"><label for="s8">How often is the device removed? How do you respond to removal requests?</label></div>
+        <div class="checklist-item" data-section="staff"><input type="checkbox" id="s9" onchange="updateProgress()"><label for="s9">If resident tries to remove/verbalizes anger: frequency? Reported? Care plan changes?</label></div>
+      </div>
+      <div class="col">
+        <h4 style="margin-bottom:12px;color:var(--primary)">Additional &amp; Licensed Staff</h4>
+        <div class="checklist-item" data-section="staff"><input type="checkbox" id="s10" onchange="updateProgress()"><label for="s10">How do you monitor the resident when the device is used?</label></div>
+        <div class="checklist-item" data-section="staff"><input type="checkbox" id="s11" onchange="updateProgress()"><label for="s11">What is the resident's functional ability (mobility, transfer, stand, toilet)?</label></div>
+        <div class="checklist-item" data-section="staff"><input type="checkbox" id="s12" onchange="updateProgress()"><label for="s12">Has the resident had physical/psychosocial changes related to the device?</label></div>
+        <div class="checklist-item" data-section="staff"><input type="checkbox" id="s13" onchange="updateProgress()"><label for="s13">Are you assigned other residents with devices? How do you manage time?</label></div>
+        <div class="checklist-item" data-section="staff"><input type="checkbox" id="s14" onchange="updateProgress()"><label for="s14">Describe training for residents with behavioral concerns</label></div>
+        <div class="checklist-item" data-section="staff"><input type="checkbox" id="s15" onchange="updateProgress()"><label for="s15">What are the facility protocols for restraint/device use?</label></div>
+        <div class="checklist-item" data-section="staff"><input type="checkbox" id="s16" onchange="updateProgress()"><label for="s16"><strong>(Licensed)</strong> How do you supervise correct application and release?</label></div>
+        <div class="checklist-item" data-section="staff"><input type="checkbox" id="s17" onchange="updateProgress()"><label for="s17"><strong>(Licensed)</strong> How often do you evaluate ongoing need? Plan for reducing/discontinuing?</label></div>
+        <div class="checklist-item" data-section="staff"><input type="checkbox" id="s18" onchange="updateProgress()"><label for="s18"><strong>(Licensed)</strong> How are staff assigned to monitor across shifts?</label></div>
+      </div>
+    </div>
+    <div class="notes-area" style="margin-top:16px"><textarea placeholder="Staff interview notes..." data-note="staff-notes" onchange="saveNotes()"></textarea></div>
+  </div>
+
+  <!-- ===== SECTION: Record Review ===== -->
+  <div class="section" id="section-record">
+    <div class="section-title">Record Review</div>
+    <div class="info-box">Review the resident's record to determine the following:</div>
+    <div class="two-col">
+      <div class="col">
+        <div class="checklist-item" data-section="record"><input type="checkbox" id="rr1" onchange="updateProgress()"><label for="rr1">What is the specific medical symptom justifying the restraint?</label></div>
+        <div class="checklist-item" data-section="record"><input type="checkbox" id="rr2" onchange="updateProgress()"><label for="rr2">Did the assessment identify if the symptom could be eliminated/reduced without the device?</label></div>
+        <div class="checklist-item" data-section="record"><input type="checkbox" id="rr3" onchange="updateProgress()"><label for="rr3">What risks and benefits were identified?</label></div>
+        <div class="checklist-item" data-section="record"><input type="checkbox" id="rr4" onchange="updateProgress()"><label for="rr4">What interventions (incl. less restrictive alternatives) were attempted? Were they successful?</label></div>
+        <div class="checklist-item" data-section="record"><input type="checkbox" id="rr5" onchange="updateProgress()"><label for="rr5">What info was provided to resident/representative re: symptom, risks, least restrictive interventions, duration?</label></div>
+        <div class="checklist-item" data-section="record"><input type="checkbox" id="rr6" onchange="updateProgress()"><label for="rr6">Was resident/representative involved in care plan development per preferences?</label></div>
+        <div class="checklist-item" data-section="record"><input type="checkbox" id="rr7" onchange="updateProgress()"><label for="rr7">What is current functional ability (strength, balance, transfers, bathroom)?</label></div>
+      </div>
+      <div class="col">
+        <div class="checklist-item" data-section="record"><input type="checkbox" id="rr8" onchange="updateProgress()"><label for="rr8">Was there a decline in functioning related to the device? Were care plan interventions revised?</label></div>
+        <div class="checklist-item" data-section="record"><input type="checkbox" id="rr9" onchange="updateProgress()"><label for="rr9">Were there injuries during device use? What was the facility's response?</label></div>
+        <div class="checklist-item" data-section="record"><input type="checkbox" id="rr10" onchange="updateProgress()"><label for="rr10">Was there a "significant change"? Was MDS significant change assessment conducted?</label></div>
+        <div class="checklist-item" data-section="record"><input type="checkbox" id="rr11" onchange="updateProgress()"><label for="rr11">Who provides monitoring? How (release schedule, bathroom, ambulation, ROM)?</label></div>
+        <div class="checklist-item" data-section="record"><input type="checkbox" id="rr12" onchange="updateProgress()"><label for="rr12">What ongoing assessment/evaluation was conducted for the medical symptom?</label></div>
+        <div class="checklist-item" data-section="record"><input type="checkbox" id="rr13" onchange="updateProgress()"><label for="rr13">What interventions attempted/evaluated to minimize/eliminate use?</label></div>
+        <div class="checklist-item" data-section="record"><input type="checkbox" id="rr14" onchange="updateProgress()"><label for="rr14">Any indication the device is used for discipline or staff convenience?</label></div>
+      </div>
+    </div>
+    <div class="notes-area" style="margin-top:16px"><textarea placeholder="Record review notes..." data-note="record-notes" onchange="saveNotes()"></textarea></div>
+  </div>
+
+  <!-- ===== SECTION: Critical Element Decisions ===== -->
+  <div class="section" id="section-decisions">
+    <div class="section-title">Critical Element Decisions</div>
+    <div class="info-box">Did the facility ensure all of the following?</div>
+
+    <div class="decision-block" data-decision="d1">
+      <div class="question">1. Ensure that the resident is free from physical restraints imposed for discipline or staff convenience?</div>
+      <div class="decision-buttons">
+        <button class="decision-btn yes" onclick="setDecision('d1','yes')">Yes</button>
+        <button class="decision-btn no" onclick="setDecision('d1','no')">No</button>
+      </div>
+      <div class="citation" id="cite-d1">&#9888; Cite F604</div>
+      <div class="notes-area"><textarea placeholder="Findings / evidence..." data-note="d1-notes" onchange="saveNotes()"></textarea></div>
+    </div>
+    <div class="decision-block" data-decision="d2">
+      <div class="question">2. Identify the medical symptom being treated when using a device or practice that meets the definition of physical restraint?</div>
+      <div class="decision-buttons">
+        <button class="decision-btn yes" onclick="setDecision('d2','yes')">Yes</button>
+        <button class="decision-btn no" onclick="setDecision('d2','no')">No</button>
+      </div>
+      <div class="citation" id="cite-d2">&#9888; Cite F604</div>
+      <div class="notes-area"><textarea placeholder="Findings / evidence..." data-note="d2-notes" onchange="saveNotes()"></textarea></div>
+    </div>
+    <div class="decision-block" data-decision="d3">
+      <div class="question">3. Define and implement interventions according to standards of practice during the use of a physical restraint for treatment of a medical symptom?</div>
+      <div class="decision-buttons">
+        <button class="decision-btn yes" onclick="setDecision('d3','yes')">Yes</button>
+        <button class="decision-btn no" onclick="setDecision('d3','no')">No</button>
+      </div>
+      <div class="citation" id="cite-d3">&#9888; Cite F604</div>
+      <div class="notes-area"><textarea placeholder="Findings / evidence..." data-note="d3-notes" onchange="saveNotes()"></textarea></div>
+    </div>
+    <div class="decision-block" data-decision="d4">
+      <div class="question">4. Provide the least restrictive restraint for the least time possible?</div>
+      <div class="decision-buttons">
+        <button class="decision-btn yes" onclick="setDecision('d4','yes')">Yes</button>
+        <button class="decision-btn no" onclick="setDecision('d4','no')">No</button>
+      </div>
+      <div class="citation" id="cite-d4">&#9888; Cite F604</div>
+      <div class="notes-area"><textarea placeholder="Findings / evidence..." data-note="d4-notes" onchange="saveNotes()"></textarea></div>
+    </div>
+    <div class="decision-block" data-decision="d5">
+      <div class="question">5. Provide ongoing monitoring and evaluation for the continued use of a physical restraint to treat a medical symptom?</div>
+      <div class="decision-buttons">
+        <button class="decision-btn yes" onclick="setDecision('d5','yes')">Yes</button>
+        <button class="decision-btn no" onclick="setDecision('d5','no')">No</button>
+      </div>
+      <div class="citation" id="cite-d5">&#9888; Cite F604</div>
+      <div class="notes-area"><textarea placeholder="Findings / evidence..." data-note="d5-notes" onchange="saveNotes()"></textarea></div>
+    </div>
+    <div class="decision-block" data-decision="d6">
+      <div class="question">6. Develop and implement interventions for reducing or discontinuing the restraint when no longer required?</div>
+      <div class="decision-buttons">
+        <button class="decision-btn yes" onclick="setDecision('d6','yes')">Yes</button>
+        <button class="decision-btn no" onclick="setDecision('d6','no')">No</button>
+      </div>
+      <div class="citation" id="cite-d6">&#9888; Cite F604</div>
+      <div class="notes-area"><textarea placeholder="Findings / evidence..." data-note="d6-notes" onchange="saveNotes()"></textarea></div>
+    </div>
+
+    <hr style="margin:24px 0;border:none;border-top:2px solid var(--border)">
+
+    <div class="decision-block" data-decision="d7">
+      <div class="question">7. For newly admitted residents: baseline care plan within 48 hours with written summary?</div>
+      <div class="decision-buttons">
+        <button class="decision-btn yes" onclick="setDecision('d7','yes')">Yes</button>
+        <button class="decision-btn no" onclick="setDecision('d7','no')">No</button>
+        <button class="decision-btn na" onclick="setDecision('d7','na')">N/A</button>
+      </div>
+      <div class="citation" id="cite-d7">&#9888; Cite F655</div>
+      <div class="na-note" id="na-d7">N/A: No admission since previous survey OR care/service not necessary in baseline care plan.</div>
+      <div class="notes-area"><textarea placeholder="Findings / evidence..." data-note="d7-notes" onchange="saveNotes()"></textarea></div>
+    </div>
+    <div class="decision-block" data-decision="d8">
+      <div class="question">8. Comprehensive assessment of physical, mental, and psychosocial needs when condition/risks present?</div>
+      <div class="decision-buttons">
+        <button class="decision-btn yes" onclick="setDecision('d8','yes')">Yes</button>
+        <button class="decision-btn no" onclick="setDecision('d8','no')">No</button>
+        <button class="decision-btn na" onclick="setDecision('d8','na')">N/A</button>
+      </div>
+      <div class="citation" id="cite-d8">&#9888; Cite F636</div>
+      <div class="na-note" id="na-d8">N/A: Condition/risks identified after assessment and didn't meet criteria for significant change MDS.</div>
+      <div class="notes-area"><textarea placeholder="Findings / evidence..." data-note="d8-notes" onchange="saveNotes()"></textarea></div>
+    </div>
+    <div class="decision-block" data-decision="d9">
+      <div class="question">9. Significant change assessment completed within 14 days?</div>
+      <div class="decision-buttons">
+        <button class="decision-btn yes" onclick="setDecision('d9','yes')">Yes</button>
+        <button class="decision-btn no" onclick="setDecision('d9','no')">No</button>
+        <button class="decision-btn na" onclick="setDecision('d9','na')">N/A</button>
+      </div>
+      <div class="citation" id="cite-d9">&#9888; Cite F637</div>
+      <div class="na-note" id="na-d9">N/A: Initial comprehensive assessment not yet completed OR no significant change in status.</div>
+      <div class="notes-area"><textarea placeholder="Findings / evidence..." data-note="d9-notes" onchange="saveNotes()"></textarea></div>
+    </div>
+    <div class="decision-block" data-decision="d10">
+      <div class="question">10. Qualified staff accurately completed the resident assessment?</div>
+      <div class="decision-buttons">
+        <button class="decision-btn yes" onclick="setDecision('d10','yes')">Yes</button>
+        <button class="decision-btn no" onclick="setDecision('d10','no')">No</button>
+      </div>
+      <div class="citation" id="cite-d10">&#9888; Cite F641</div>
+      <div class="notes-area"><textarea placeholder="Findings / evidence..." data-note="d10-notes" onchange="saveNotes()"></textarea></div>
+    </div>
+    <div class="decision-block" data-decision="d11">
+      <div class="question">11. Comprehensive person-centered care plan with measurable objectives, timeframes, goals, and preferences?</div>
+      <div class="decision-buttons">
+        <button class="decision-btn yes" onclick="setDecision('d11','yes')">Yes</button>
+        <button class="decision-btn no" onclick="setDecision('d11','no')">No</button>
+        <button class="decision-btn na" onclick="setDecision('d11','na')">N/A</button>
+      </div>
+      <div class="citation" id="cite-d11">&#9888; Cite F656</div>
+      <div class="na-note" id="na-d11">N/A: Comprehensive assessment was not completed.</div>
+      <div class="notes-area"><textarea placeholder="Findings / evidence..." data-note="d11-notes" onchange="saveNotes()"></textarea></div>
+    </div>
+
+    <hr style="margin:24px 0;border:none;border-top:2px solid var(--border)">
+    <div class="info-box"><strong>Other Tags/Care Areas:</strong> Dignity (CA), Right to be Informed F552, Right to Participate In Care F553, Accident Hazards (CA), Bed Rails F700, Behavioral-Emotional Status (CA), Unnecessary/Psychotropic Medications (CA), Sufficient and Competent Staffing, Medical Director F841, Resident Records F842, QAA/QAPI (Task).</div>
+  </div>
+
+</div><!-- /container -->
+
+<!-- ===== FLOATING ACTIONS ===== -->
+<div class="floating-actions no-print">
+  <button class="fab reset" onclick="resetAll()">Reset</button>
+  <button class="fab export" onclick="exportSummary()">Export</button>
+  <button class="fab report" onclick="openReportModal()">&#9888; Generate Report</button>
+  <button class="fab save" onclick="saveState()">Save</button>
+</div>
+<div class="toast no-print" id="toast"></div>
+
+<!-- ===== REPORT FORM MODAL ===== -->
+<div class="modal-overlay" id="reportModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>&#9888; Generate Readiness Assessment Report</h2>
+      <button class="modal-close" onclick="closeReportModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="info-box warning" style="margin-bottom:20px">
+        This will generate a <strong>CMS-2567 Statement of Deficiencies</strong> report based on all "No" decisions marked above. Complete all Critical Element Decisions before generating.
+      </div>
+      <div id="deficiencyPreview"></div>
+      <hr style="margin:20px 0;border:none;border-top:1px solid var(--border)">
+      <h4 style="margin-bottom:14px;color:var(--primary)">Facility Information</h4>
+      <div class="form-row">
+        <div class="form-group"><label>Facility Name</label><input type="text" id="rpt-facility" placeholder="e.g., Sunrise Care Center"></div>
+        <div class="form-group"><label>Provider / Supplier / CLIA #</label><input type="text" id="rpt-provider-id" placeholder="e.g., 555123"></div>
+      </div>
+      <div class="form-group"><label>Facility Address</label><input type="text" id="rpt-address" placeholder="e.g., 123 Main St, Springfield, IL 62704"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Survey Date(s)</label><input type="text" id="rpt-survey-date" placeholder="e.g., 03/18/2026 - 03/21/2026"></div>
+        <div class="form-group"><label>Survey ID / Event ID</label><input type="text" id="rpt-survey-id" placeholder="e.g., 7H4B"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Surveyor Name</label><input type="text" id="rpt-surveyor" placeholder="e.g., Jane Smith, RN"></div>
+        <div class="form-group"><label>Surveyor Title</label><input type="text" id="rpt-surveyor-title" placeholder="e.g., Health Facilities Evaluator Nurse"></div>
+      </div>
+      <div class="form-group"><label>Resident Identifier (anonymized)</label><input type="text" id="rpt-resident" placeholder="e.g., Resident #14"></div>
+      <hr style="margin:20px 0;border:none;border-top:1px solid var(--border)">
+      <h4 style="margin-bottom:14px;color:var(--primary)">Severity &amp; Scope</h4>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Severity</label>
+          <select id="rpt-severity">
+            <option value="">-- Select --</option>
+            <option value="1">Level 1 - Potential for minimal harm</option>
+            <option value="2">Level 2 - Minimal harm or potential for actual harm</option>
+            <option value="3">Level 3 - Actual harm that is not immediate jeopardy</option>
+            <option value="4">Level 4 - Immediate jeopardy to resident health or safety</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Scope</label>
+          <select id="rpt-scope">
+            <option value="">-- Select --</option>
+            <option value="isolated">Isolated - Affects 1 or a limited number of residents</option>
+            <option value="pattern">Pattern - Affects more than a limited number of residents</option>
+            <option value="widespread">Widespread - Pervasive throughout the facility</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Plan of Correction Due Date</label>
+        <input type="date" id="rpt-poc-date">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-btn ghost" onclick="closeReportModal()">Cancel</button>
+      <button class="modal-btn secondary" onclick="generateAndDownloadHTML()">&#128196; Download HTML</button>
+      <button class="modal-btn primary" onclick="generateReport()">&#128196; Preview &amp; Print Report</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PRINT REPORT CONTAINER ===== -->
+<div id="printReport"></div>
+
+<script>
+const STORAGE_KEY = 'cms20077_state';
+
+// ===== Tag Database =====
+const TAG_DB = {
+  d1: {
+    tag: 'F604', title: 'Right to be Free from Physical Restraints',
+    regulation: '483.12(a)(2)',
+    requirement: 'The resident has the right to be free from physical restraints imposed for purposes of discipline or convenience and that are not required to treat the resident\'s medical symptoms.',
+    question: 'Ensure that the resident is free from physical restraints imposed for discipline or staff convenience'
+  },
+  d2: {
+    tag: 'F604', title: 'Right to be Free from Physical Restraints',
+    regulation: '483.12(a)(2)',
+    requirement: 'The resident has the right to be free from physical restraints imposed for purposes of discipline or convenience and that are not required to treat the resident\'s medical symptoms.',
+    question: 'Identify the medical symptom being treated when using a device or practice that meets the definition of physical restraint'
+  },
+  d3: {
+    tag: 'F604', title: 'Right to be Free from Physical Restraints',
+    regulation: '483.12(a)(2)',
+    requirement: 'The resident has the right to be free from physical restraints imposed for purposes of discipline or convenience and that are not required to treat the resident\'s medical symptoms.',
+    question: 'Define and implement interventions according to standards of practice during restraint use for treatment of a medical symptom'
+  },
+  d4: {
+    tag: 'F604', title: 'Right to be Free from Physical Restraints',
+    regulation: '483.12(a)(2)',
+    requirement: 'The resident has the right to be free from physical restraints imposed for purposes of discipline or convenience and that are not required to treat the resident\'s medical symptoms.',
+    question: 'Provide the least restrictive restraint for the least time possible'
+  },
+  d5: {
+    tag: 'F604', title: 'Right to be Free from Physical Restraints',
+    regulation: '483.12(a)(2)',
+    requirement: 'The resident has the right to be free from physical restraints imposed for purposes of discipline or convenience and that are not required to treat the resident\'s medical symptoms.',
+    question: 'Provide ongoing monitoring and evaluation for the continued use of a physical restraint to treat a medical symptom'
+  },
+  d6: {
+    tag: 'F604', title: 'Right to be Free from Physical Restraints',
+    regulation: '483.12(a)(2)',
+    requirement: 'The resident has the right to be free from physical restraints imposed for purposes of discipline or convenience and that are not required to treat the resident\'s medical symptoms.',
+    question: 'Develop and implement interventions for reducing or discontinuing the restraint when no longer required'
+  },
+  d7: {
+    tag: 'F655', title: 'Baseline Care Plan',
+    regulation: '483.21(a)',
+    requirement: 'The facility must develop and implement a baseline care plan for each resident that includes the instructions needed to provide effective and person-centered care of the resident that meet professional standards of quality care within 48 hours of a resident\'s admission.',
+    question: 'Develop and implement a baseline care plan within 48 hours of admission with written summary'
+  },
+  d8: {
+    tag: 'F636', title: 'Comprehensive Assessment',
+    regulation: '483.20(b)',
+    requirement: 'The facility must make a comprehensive, accurate, standardized, reproducible assessment of each resident\'s functional capacity.',
+    question: 'Comprehensively assess the resident\'s physical, mental, and psychosocial needs'
+  },
+  d9: {
+    tag: 'F637', title: 'Significant Change Assessment',
+    regulation: '483.20(b)(2)(ii)',
+    requirement: 'The facility must conduct a comprehensive assessment within 14 days after the facility determines, or should have determined, that there has been a significant change in the resident\'s physical or mental condition.',
+    question: 'Complete a significant change assessment within 14 days'
+  },
+  d10: {
+    tag: 'F641', title: 'Accuracy of Assessment',
+    regulation: '483.20(g)',
+    requirement: 'The assessment must accurately reflect the resident\'s status. The assessment must be conducted or coordinated by a registered nurse who signs and certifies the completion of the assessment.',
+    question: 'Staff with skills and qualifications accurately completed the resident assessment'
+  },
+  d11: {
+    tag: 'F656', title: 'Comprehensive Care Plan',
+    regulation: '483.21(b)',
+    requirement: 'The facility must develop and implement a comprehensive person-centered care plan for each resident that includes measurable objectives and timeframes to meet a resident\'s medical, nursing, and mental and psychosocial needs.',
+    question: 'Develop and implement a comprehensive person-centered care plan with measurable objectives, timeframes, goals'
+  }
+};
+
+// ===== Nav & UI =====
+function showSection(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('section-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+function toggleCard(header) {
+  header.classList.toggle('open');
+  header.nextElementSibling.classList.toggle('open');
+}
+
+// ===== Decisions =====
+function setDecision(id, value) {
+  const block = document.querySelector(`[data-decision="${id}"]`);
+  block.querySelectorAll('.decision-btn').forEach(b => b.classList.remove('selected'));
+  block.querySelector(`.decision-btn.${value}`).classList.add('selected');
+  const cite = document.getElementById('cite-' + id);
+  const naNote = document.getElementById('na-' + id);
+  if (value === 'no') { cite.classList.add('show'); if (naNote) naNote.classList.remove('show'); }
+  else if (value === 'na') { cite.classList.remove('show'); if (naNote) naNote.classList.add('show'); }
+  else { cite.classList.remove('show'); if (naNote) naNote.classList.remove('show'); }
+  updateProgress();
+}
+
+// ===== Progress =====
+function updateProgress() {
+  document.querySelectorAll('.checklist-item').forEach(item => {
+    const cb = item.querySelector('input[type="checkbox"]');
+    if (cb) item.classList.toggle('checked', cb.checked);
+  });
+  const totalChecks = document.querySelectorAll('.checklist-item input[type="checkbox"]').length;
+  const checkedChecks = document.querySelectorAll('.checklist-item input[type="checkbox"]:checked').length;
+  const totalDecisions = document.querySelectorAll('.decision-block').length;
+  const uniqueDecisions = new Set();
+  document.querySelectorAll('.decision-btn.selected').forEach(btn => {
+    uniqueDecisions.add(btn.closest('.decision-block').dataset.decision);
+  });
+  const total = totalChecks + totalDecisions;
+  const done = checkedChecks + uniqueDecisions.size;
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+  document.getElementById('progressBar').style.width = pct + '%';
+  document.getElementById('progressText').textContent = `${done} of ${total} items completed (${pct}%)`;
+
+  const secCfg = {
+    trigger: 4, advance: 3, observations: 13, resident: 10, staff: 18, record: 14
+  };
+  for (const [sec, cnt] of Object.entries(secCfg)) {
+    const badge = document.getElementById('badge-' + sec);
+    if (!badge) continue;
+    let d = 0;
+    document.querySelectorAll(`[data-section="${sec}"] input[type="checkbox"]:checked`).forEach(() => d++);
+    badge.textContent = `${d}/${cnt}`;
+    badge.classList.toggle('complete', d === cnt);
+  }
+  // Decisions badge
+  const dbadge = document.getElementById('badge-decisions');
+  if (dbadge) {
+    dbadge.textContent = `${uniqueDecisions.size}/11`;
+    dbadge.classList.toggle('complete', uniqueDecisions.size === 11);
+  }
+}
+
+// ===== State =====
+function getState() {
+  const state = { checkboxes: {}, decisions: {}, notes: {} };
+  document.querySelectorAll('.checklist-item input[type="checkbox"]').forEach(cb => {
+    state.checkboxes[cb.id] = cb.checked;
+  });
+  document.querySelectorAll('.decision-block').forEach(block => {
+    const sel = block.querySelector('.decision-btn.selected');
+    if (sel) {
+      state.decisions[block.dataset.decision] = sel.classList.contains('yes') ? 'yes' :
+        sel.classList.contains('no') ? 'no' : 'na';
+    }
+  });
+  document.querySelectorAll('textarea[data-note]').forEach(ta => {
+    if (ta.value.trim()) state.notes[ta.dataset.note] = ta.value;
+  });
+  return state;
+}
+
+function loadState(state) {
+  if (!state) return;
+  if (state.checkboxes) {
+    for (const [id, checked] of Object.entries(state.checkboxes)) {
+      const cb = document.getElementById(id);
+      if (cb) cb.checked = checked;
+    }
+  }
+  if (state.decisions) {
+    for (const [id, value] of Object.entries(state.decisions)) setDecision(id, value);
+  }
+  if (state.notes) {
+    for (const [key, value] of Object.entries(state.notes))  {
+      const ta = document.querySelector(`textarea[data-note="${key}"]`);
+      if (ta) ta.value = value;
+    }
+  }
+  updateProgress();
+}
+
+function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(getState())); showToast('Progress saved'); }
+function saveNotes() { localStorage.setItem(STORAGE_KEY, JSON.stringify(getState())); }
+
+function resetAll() {
+  if (!confirm('Reset all progress? This cannot be undone.')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+  document.querySelectorAll('.decision-btn').forEach(b => b.classList.remove('selected'));
+  document.querySelectorAll('.citation').forEach(c => c.classList.remove('show'));
+  document.querySelectorAll('.na-note').forEach(n => n.classList.remove('show'));
+  document.querySelectorAll('textarea').forEach(ta => ta.value = '');
+  updateProgress();
+  showToast('All progress reset');
+}
+
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg; toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2000);
+}
+
+// ===== Export Plain Text =====
+function exportSummary() {
+  const state = getState();
+  let text = 'CMS-20077 PHYSICAL RESTRAINTS - SURVEY SUMMARY\nGenerated: ' + new Date().toLocaleString() + '\n' + '='.repeat(50) + '\n\n';
+  const secs = [
+    { name: 'Trigger Conditions', prefix: 't', count: 4 },
+    { name: 'Advance Review', prefix: 'a', count: 3 },
+    { name: 'Observations', prefix: 'o', count: 13 },
+    { name: 'Resident Interview', prefix: 'r', count: 10 },
+    { name: 'Staff Interview', prefix: 's', count: 18 },
+    { name: 'Record Review', prefix: 'rr', count: 14 },
+  ];
+  for (const s of secs) {
+    let d = 0;
+    for (let i = 1; i <= s.count; i++) if (state.checkboxes[s.prefix + i]) d++;
+    text += `${s.name}: ${d}/${s.count} completed\n`;
+  }
+  text += '\n' + '-'.repeat(50) + '\nCRITICAL ELEMENT DECISIONS:\n\n';
+  for (const [id, info] of Object.entries(TAG_DB)) {
+    const answer = state.decisions[id] || 'Not answered';
+    const line = answer === 'no' ? ` >>> CITE ${info.tag}` : '';
+    text += `  ${info.question}: ${answer.toUpperCase()}${line}\n`;
+  }
+  if (Object.keys(state.notes).length > 0) {
+    text += '\n' + '-'.repeat(50) + '\nNOTES:\n\n';
+    for (const [k, v] of Object.entries(state.notes)) text += `[${k}]\n${v}\n\n`;
+  }
+  const blob = new Blob([text], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'CMS-20077_Survey_Summary_' + new Date().toISOString().slice(0,10) + '.txt';
+  a.click();
+  showToast('Summary exported');
+}
+
+// ===== REPORT GENERATION =====
+function getDeficiencies() {
+  const state = getState();
+  const defs = [];
+  for (const [id, info] of Object.entries(TAG_DB)) {
+    if (state.decisions[id] === 'no') {
+      defs.push({ ...info, id, evidence: state.notes[id + '-notes'] || '' });
+    }
+  }
+  return defs;
+}
+
+function openReportModal() {
+  const defs = getDeficiencies();
+  const preview = document.getElementById('deficiencyPreview');
+  if (defs.length === 0) {
+    preview.innerHTML = '<div class="info-box" style="background:#e8f8e8;border-left-color:#27ae60"><strong>No Deficiencies Found</strong><br>All decisions are marked "Yes" or "N/A". You can still generate a clean report for documentation purposes.</div>';
+  } else {
+    // Group by tag
+    const grouped = {};
+    for (const d of defs) {
+      if (!grouped[d.tag]) grouped[d.tag] = { ...d, items: [] };
+      grouped[d.tag].items.push(d);
+    }
+    let html = `<div style="margin-bottom:12px;font-weight:600;color:var(--accent)">&#9888; ${defs.length} deficiency finding(s) detected across ${Object.keys(grouped).length} tag(s):</div>`;
+    for (const [tag, g] of Object.entries(grouped)) {
+      html += `<div class="deficiency-preview"><span class="tag-num">${tag}</span> &mdash; ${g.title} [${g.regulation}]<ul style="margin:6px 0 0 18px;font-size:0.85rem">`;
+      for (const item of g.items) {
+        html += `<li>${item.question}${item.evidence ? ' <em style="color:#666">(notes attached)</em>' : ''}</li>`;
+      }
+      html += '</ul></div>';
+    }
+    preview.innerHTML = html;
+  }
+  document.getElementById('reportModal').classList.add('show');
+}
+
+function closeReportModal() {
+  document.getElementById('reportModal').classList.remove('show');
+}
+
+function buildReportHTML(forDownload) {
+  const defs = getDeficiencies();
+  const state = getState();
+  const facility = document.getElementById('rpt-facility').value || '[Facility Name]';
+  const providerId = document.getElementById('rpt-provider-id').value || '[Provider #]';
+  const address = document.getElementById('rpt-address').value || '[Facility Address]';
+  const surveyDate = document.getElementById('rpt-survey-date').value || '[Survey Date]';
+  const surveyId = document.getElementById('rpt-survey-id').value || '[Event ID]';
+  const surveyor = document.getElementById('rpt-surveyor').value || '[Surveyor Name]';
+  const surveyorTitle = document.getElementById('rpt-surveyor-title').value || '[Title]';
+  const resident = document.getElementById('rpt-resident').value || '[Resident #]';
+  const severityEl = document.getElementById('rpt-severity');
+  const severity = severityEl.value ? severityEl.options[severityEl.selectedIndex].text : '[Not Selected]';
+  const scopeEl = document.getElementById('rpt-scope');
+  const scope = scopeEl.value ? scopeEl.options[scopeEl.selectedIndex].text : '[Not Selected]';
+  const pocDate = document.getElementById('rpt-poc-date').value || '[TBD]';
+  const now = new Date().toLocaleString();
+
+  // Group deficiencies by tag
+  const grouped = {};
+  for (const d of defs) {
+    if (!grouped[d.tag]) grouped[d.tag] = { ...d, items: [] };
+    grouped[d.tag].items.push(d);
+  }
+
+  let html = `
+    <h1>Facility Survey Readiness Assessment</h1>
+    <h2>Statement of Deficiencies and Plan of Correction</h2>
+    <p style="text-align:center;font-size:11pt;margin-bottom:16px">CMS-2567 &mdash; Physical Restraints Pathway (CMS-20077)</p>
+
+    <table class="report-meta-table">
+      <tr><td class="label">Facility Name</td><td colspan="3">${esc(facility)}</td></tr>
+      <tr><td class="label">Address</td><td colspan="3">${esc(address)}</td></tr>
+      <tr>
+        <td class="label">Provider / CLIA #</td><td>${esc(providerId)}</td>
+        <td class="label">Survey Completed</td><td>${esc(surveyDate)}</td>
+      </tr>
+      <tr>
+        <td class="label">Event ID</td><td>${esc(surveyId)}</td>
+        <td class="label">Surveyor</td><td>${esc(surveyor)}, ${esc(surveyorTitle)}</td>
+      </tr>
+      <tr>
+        <td class="label">Resident Identifier</td><td>${esc(resident)}</td>
+        <td class="label">Report Generated</td><td>${now}</td>
+      </tr>
+      <tr>
+        <td class="label">Severity</td><td>${esc(severity)}</td>
+        <td class="label">Scope</td><td>${esc(scope)}</td>
+      </tr>
+    </table>
+
+    <div class="deficiency-section">
+      <h3>Summary of Findings</h3>
+      <table class="summary-table">
+        <thead><tr><th>#</th><th>Critical Element</th><th>Finding</th><th>Tag</th></tr></thead>
+        <tbody>`;
+
+  let idx = 0;
+  for (const [id, info] of Object.entries(TAG_DB)) {
+    idx++;
+    const answer = state.decisions[id] || 'Not answered';
+    const cls = answer === 'no' ? 'fail' : (answer === 'yes' ? 'pass' : '');
+    const label = answer === 'no' ? 'DEFICIENT' : (answer === 'yes' ? 'MET' : answer.toUpperCase());
+    html += `<tr><td>${idx}</td><td>${info.question}</td><td class="${cls}">${label}</td><td>${answer === 'no' ? info.tag : '&mdash;'}</td></tr>`;
+  }
+
+  html += `</tbody></table></div>`;
+
+  if (defs.length > 0) {
+    html += `<div class="deficiency-section"><h3>Deficiency Details</h3>`;
+    for (const [tag, g] of Object.entries(grouped)) {
+      html += `
+        <div class="finding-block">
+          <div class="tag-label">TAG ${tag} &mdash; ${g.title}</div>
+          <p><strong>Regulation:</strong> 42 CFR &sect;${g.regulation}</p>
+          <p><strong>Requirement:</strong> ${g.requirement}</p>
+          <p><strong>Based on survey pathway CMS-20077 Physical Restraints, the facility failed to:</strong></p>
+          <ul style="margin:6px 0 6px 20px">`;
+      for (const item of g.items) {
+        html += `<li>${item.question}</li>`;
+      }
+      html += `</ul>`;
+
+      // Evidence from notes
+      const evidenceItems = g.items.filter(i => i.evidence);
+      if (evidenceItems.length > 0) {
+        html += `<p><strong>Evidence / Surveyor Findings:</strong></p>`;
+        for (const item of evidenceItems) {
+          html += `<p style="margin-left:16px;white-space:pre-wrap;background:#fff;padding:8px;border:1px solid #ddd;border-radius:4px">${esc(item.evidence)}</p>`;
+        }
+      }
+
+      // Add observation, interview, record review notes if available
+      const contextNotes = [];
+      if (state.notes['observations-notes']) contextNotes.push({ label: 'Observation Notes', text: state.notes['observations-notes'] });
+      if (state.notes['resident-notes']) contextNotes.push({ label: 'Resident Interview Notes', text: state.notes['resident-notes'] });
+      if (state.notes['staff-notes']) contextNotes.push({ label: 'Staff Interview Notes', text: state.notes['staff-notes'] });
+      if (state.notes['record-notes']) contextNotes.push({ label: 'Record Review Notes', text: state.notes['record-notes'] });
+
+      if (contextNotes.length > 0) {
+        html += `<p><strong>Supporting Documentation:</strong></p>`;
+        for (const cn of contextNotes) {
+          html += `<p style="margin-left:16px"><em>${cn.label}:</em><br><span style="white-space:pre-wrap;font-size:10pt">${esc(cn.text)}</span></p>`;
+        }
+      }
+
+      html += `
+          <div class="plan-section">
+            <p class="plan-label">PLAN OF CORRECTION</p>
+            <p style="color:#888;font-style:italic">To be completed by facility. Due date: ${esc(pocDate)}</p>
+            <p style="min-height:60px;border:1px dashed #ccc;padding:8px;margin-top:4px;border-radius:4px">&nbsp;</p>
+          </div>
+        </div>`;
+    }
+    html += `</div>`;
+  } else {
+    html += `
+      <div class="deficiency-section">
+        <h3>Findings</h3>
+        <p style="padding:16px;background:#e8f8e8;border-radius:8px;text-align:center;font-weight:600;color:#27ae60">
+          No deficiencies identified. The facility met all critical elements reviewed under the Physical Restraints pathway.
+        </p>
+      </div>`;
+  }
+
+  html += `
+    <div class="signature-block">
+      <div class="sig-line">Surveyor Signature / Date</div>
+      <div class="sig-line">Facility Administrator Signature / Date</div>
+    </div>
+    <div class="watermark">
+      Generated from CMS-20077 Physical Restraints Interactive Survey Pathway &bull; ${now}
+    </div>`;
+
+  return html;
+}
+
+function esc(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function generateReport() {
+  const reportDiv = document.getElementById('printReport');
+  reportDiv.innerHTML = buildReportHTML(false);
+  reportDiv.classList.add('visible');
+  closeReportModal();
+  document.getElementById('mainHeader').style.display = 'none';
+  document.getElementById('mainApp').style.display = 'none';
+  document.querySelector('.floating-actions').innerHTML = `
+    <button class="fab reset" onclick="backToSurvey()">&#8592; Back to Survey</button>
+    <button class="fab export" onclick="window.print()">&#128424; Print / PDF</button>
+    <button class="fab secondary" style="background:var(--primary);color:white;border:none;padding:12px 20px;border-radius:25px;font-size:0.85rem;font-weight:600;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.15)" onclick="downloadReportHTML()">&#128196; Download HTML</button>
+  `;
+  window.scrollTo(0, 0);
+}
+
+function backToSurvey() {
+  document.getElementById('printReport').classList.remove('visible');
+  document.getElementById('printReport').innerHTML = '';
+  document.getElementById('mainHeader').style.display = '';
+  document.getElementById('mainApp').style.display = '';
+  document.querySelector('.floating-actions').innerHTML = `
+    <button class="fab reset" onclick="resetAll()">Reset</button>
+    <button class="fab export" onclick="exportSummary()">Export</button>
+    <button class="fab report" onclick="openReportModal()">&#9888; Generate Report</button>
+    <button class="fab save" onclick="saveState()">Save</button>
+  `;
+}
+
+function generateAndDownloadHTML() {
+  downloadReportHTML();
+  closeReportModal();
+}
+
+function downloadReportHTML() {
+  const content = buildReportHTML(true);
+  const full = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Facility Survey Readiness Assessment - CMS-2567 Statement of Deficiencies</title>
+<style>
+  body { font-family: "Times New Roman", Times, serif; font-size: 11pt; color: #000; max-width: 850px; margin: 30px auto; padding: 20px; }
+  h1 { text-align: center; font-size: 14pt; margin-bottom: 2px; text-transform: uppercase; }
+  h2 { text-align: center; font-size: 12pt; margin-bottom: 16px; font-weight: normal; }
+  .report-meta-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 10pt; }
+  .report-meta-table td { border: 1px solid #000; padding: 4px 8px; vertical-align: top; }
+  .report-meta-table .label { font-weight: bold; background: #f0f0f0; width: 180px; }
+  .deficiency-section { margin-bottom: 24px; page-break-inside: avoid; }
+  .deficiency-section h3 { font-size: 12pt; border-bottom: 2px solid #000; padding-bottom: 4px; margin-bottom: 10px; }
+  .finding-block { margin-bottom: 16px; padding: 10px 14px; border-left: 3px solid #c0392b; background: #fafafa; }
+  .finding-block .tag-label { font-weight: bold; font-size: 11pt; color: #c0392b; margin-bottom: 4px; }
+  .finding-block p { margin: 4px 0; font-size: 10.5pt; line-height: 1.5; }
+  .plan-section { margin-top: 8px; padding-top: 8px; border-top: 1px dashed #aaa; }
+  .plan-section .plan-label { font-weight: bold; font-size: 10pt; }
+  .summary-table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 10pt; }
+  .summary-table th, .summary-table td { border: 1px solid #000; padding: 6px 10px; text-align: left; }
+  .summary-table th { background: #e8e8e8; font-weight: bold; }
+  .summary-table .fail { color: #c0392b; font-weight: bold; }
+  .summary-table .pass { color: #27ae60; }
+  .signature-block { margin-top: 40px; display: flex; justify-content: space-between; gap: 40px; }
+  .sig-line { flex: 1; border-top: 1px solid #000; padding-top: 4px; font-size: 9pt; text-align: center; }
+  .watermark { text-align: center; font-size: 8pt; color: #999; margin-top: 20px; border-top: 1px solid #ddd; padding-top: 8px; }
+  @media print { body { margin: 0; padding: 15px; } }
+</style></head><body>${content}</body></html>

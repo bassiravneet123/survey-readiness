@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Facility Survey Readiness Assessment - CMS-20081 Respiratory Care</title>
+<style>
+  :root {
+    --primary: #1a5276; --primary-light: #2980b9; --accent: #e74c3c; --success: #27ae60;
+    --warning: #f39c12; --bg: #f5f7fa; --card-bg: #ffffff; --text: #2c3e50;
+    --text-light: #7f8c8d; --border: #dce1e8; --shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+  .header { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: white; padding: 24px 32px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px rgba(0,0,0,0.15); }
+  .header h1 { font-size: 1.4rem; font-weight: 600; }
+  .header .subtitle { font-size: 0.9rem; opacity: 0.85; margin-top: 4px; }
+  .header .top-label { font-size: 0.8rem; opacity: 0.7; margin-bottom: 4px; letter-spacing: 1px; text-transform: uppercase; }
+  .progress-bar-container { background: rgba(255,255,255,0.2); border-radius: 8px; height: 8px; margin-top: 12px; overflow: hidden; }
+  .progress-bar { background: var(--success); height: 100%; border-radius: 8px; transition: width 0.4s ease; width: 0%; }
+  .progress-text { font-size: 0.8rem; margin-top: 4px; opacity: 0.9; }
+  .container { max-width: 960px; margin: 0 auto; padding: 24px 16px 80px; }
+  .nav-tabs { display: flex; gap: 4px; margin-bottom: 24px; overflow-x: auto; padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
+  .nav-tab { padding: 10px 16px; border: none; background: var(--card-bg); color: var(--text-light); font-size: 0.85rem; font-weight: 500; border-radius: 8px 8px 0 0; cursor: pointer; white-space: nowrap; transition: all 0.2s; border-bottom: 3px solid transparent; }
+  .nav-tab:hover { color: var(--primary); }
+  .nav-tab.active { color: var(--primary); border-bottom-color: var(--primary); background: var(--card-bg); box-shadow: var(--shadow); }
+  .nav-tab .tab-badge { display: inline-block; background: var(--border); color: var(--text-light); font-size: 0.7rem; padding: 1px 6px; border-radius: 10px; margin-left: 6px; }
+  .nav-tab.active .tab-badge { background: var(--primary-light); color: white; }
+  .nav-tab .tab-badge.complete { background: var(--success); color: white; }
+  .section { display: none; } .section.active { display: block; }
+  .card { background: var(--card-bg); border-radius: 12px; box-shadow: var(--shadow); margin-bottom: 16px; overflow: hidden; border: 1px solid var(--border); }
+  .card-header { padding: 16px 20px; cursor: pointer; display: flex; align-items: center; gap: 12px; user-select: none; transition: background 0.2s; }
+  .card-header:hover { background: #f8f9fb; }
+  .card-header .arrow { font-size: 0.7rem; transition: transform 0.3s; color: var(--text-light); }
+  .card-header.open .arrow { transform: rotate(90deg); }
+  .card-header h3 { font-size: 1rem; font-weight: 600; flex: 1; }
+  .card-body { display: none; padding: 0 20px 20px; } .card-body.open { display: block; }
+  .checklist-item { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid #f0f2f5; align-items: flex-start; }
+  .checklist-item:last-child { border-bottom: none; }
+  .checklist-item input[type="checkbox"] { width: 20px; height: 20px; margin-top: 2px; flex-shrink: 0; accent-color: var(--primary); cursor: pointer; }
+  .checklist-item label { font-size: 0.92rem; cursor: pointer; flex: 1; }
+  .checklist-item.checked label { color: var(--text-light); text-decoration: line-through; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  @media (max-width: 900px) { .three-col { grid-template-columns: 1fr; } }
+  @media (max-width: 768px) { .two-col { grid-template-columns: 1fr; } .nav-tabs { gap: 2px; } .nav-tab { padding: 8px 12px; font-size: 0.8rem; } }
+  .two-col .col, .three-col .col { background: #f8f9fb; border-radius: 8px; padding: 16px; }
+  .decision-block { background: var(--card-bg); border-radius: 12px; box-shadow: var(--shadow); border: 1px solid var(--border); margin-bottom: 16px; padding: 20px; }
+  .decision-block .question { font-size: 0.95rem; font-weight: 500; margin-bottom: 12px; line-height: 1.5; }
+  .decision-buttons { display: flex; gap: 8px; margin-bottom: 8px; }
+  .decision-btn { padding: 8px 24px; border: 2px solid var(--border); border-radius: 8px; background: white; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+  .decision-btn:hover { border-color: var(--primary-light); }
+  .decision-btn.yes.selected { background: var(--success); color: white; border-color: var(--success); }
+  .decision-btn.no.selected { background: var(--accent); color: white; border-color: var(--accent); }
+  .decision-btn.na.selected { background: var(--text-light); color: white; border-color: var(--text-light); }
+  .citation { margin-top: 10px; padding: 10px 14px; background: #fdf0ef; border-left: 4px solid var(--accent); border-radius: 4px; font-size: 0.88rem; font-weight: 600; color: var(--accent); display: none; }
+  .citation.show { display: block; }
+  .na-note { margin-top: 8px; padding: 10px 14px; background: #f5f5f5; border-left: 4px solid var(--text-light); border-radius: 4px; font-size: 0.85rem; color: var(--text-light); display: none; }
+  .na-note.show { display: block; }
+  .notes-area { margin-top: 12px; }
+  .notes-area textarea { width: 100%; min-height: 60px; border: 1px solid var(--border); border-radius: 8px; padding: 10px; font-family: inherit; font-size: 0.88rem; resize: vertical; transition: border-color 0.2s; }
+  .notes-area textarea:focus { outline: none; border-color: var(--primary-light); }
+  .notes-area textarea::placeholder { color: #bbb; }
+  .info-box { background: #eaf2f8; border-left: 4px solid var(--primary-light); border-radius: 4px; padding: 14px 18px; margin-bottom: 16px; font-size: 0.9rem; }
+  .info-box.warning { background: #fef9e7; border-left-color: var(--warning); }
+  .section-title { font-size: 1.1rem; font-weight: 700; color: var(--primary); margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid var(--primary-light); }
+  .floating-actions { position: fixed; bottom: 20px; right: 20px; display: flex; gap: 8px; z-index: 50; }
+  .fab { padding: 12px 20px; border: none; border-radius: 25px; font-size: 0.85rem; font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: all 0.2s; }
+  .fab:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.2); }
+  .fab.save { background: var(--primary); color: white; }
+  .fab.reset { background: white; color: var(--text); border: 1px solid var(--border); }
+  .fab.export { background: var(--success); color: white; }
+  .fab.report { background: var(--accent); color: white; }
+  .toast { position: fixed; bottom: 80px; right: 20px; background: var(--text); color: white; padding: 12px 20px; border-radius: 8px; font-size: 0.88rem; opacity: 0; transform: translateY(10px); transition: all 0.3s; z-index: 200; }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  /* Modal */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 500; justify-content: center; align-items: center; }
+  .modal-overlay.show { display: flex; }
+  .modal { background: white; border-radius: 16px; width: 95%; max-width: 700px; max-height: 90vh; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.3); display: flex; flex-direction: column; }
+  .modal-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  .modal-header h2 { font-size: 1.15rem; color: var(--primary); }
+  .modal-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-light); padding: 4px 8px; border-radius: 6px; }
+  .modal-close:hover { background: #f0f0f0; }
+  .modal-body { padding: 24px; overflow-y: auto; flex: 1; }
+  .modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; gap: 8px; justify-content: flex-end; }
+  .modal-btn { padding: 10px 24px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; border: 1px solid var(--border); transition: all 0.2s; }
+  .modal-btn.primary { background: var(--accent); color: white; border-color: var(--accent); }
+  .modal-btn.primary:hover { background: #c0392b; }
+  .modal-btn.secondary { background: var(--primary); color: white; border-color: var(--primary); }
+  .modal-btn.secondary:hover { background: #154360; }
+  .modal-btn.ghost { background: white; color: var(--text); }
+  .modal-btn.ghost:hover { background: #f5f5f5; }
+  .form-group { margin-bottom: 18px; }
+  .form-group label { display: block; font-weight: 600; font-size: 0.88rem; margin-bottom: 6px; color: var(--text); }
+  .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-family: inherit; font-size: 0.9rem; transition: border-color 0.2s; }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--primary-light); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
+  .deficiency-preview { background: #fdf0ef; border: 1px solid #f5c6cb; border-radius: 8px; padding: 12px 16px; margin-top: 12px; font-size: 0.85rem; }
+  .deficiency-preview .tag-num { font-weight: 700; color: var(--accent); }
+
+  /* Print Report */
+  @media print { body * { visibility: hidden; } #printReport, #printReport * { visibility: visible; } #printReport { position: absolute; left: 0; top: 0; width: 100%; font-family: "Times New Roman", Times, serif; font-size: 11pt; color: #000; } .no-print { display: none !important; } }
+  #printReport { display: none; font-family: "Times New Roman", Times, serif; color: #000; font-size: 11pt; }
+  #printReport.visible { display: block; background: white; padding: 40px; max-width: 850px; margin: 20px auto; box-shadow: 0 0 20px rgba(0,0,0,0.1); border: 1px solid #ccc; }
+  #printReport h1 { text-align: center; font-size: 14pt; margin-bottom: 2px; text-transform: uppercase; }
+  #printReport h2 { text-align: center; font-size: 12pt; margin-bottom: 16px; font-weight: normal; }
+  #printReport .report-meta-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 10pt; }
+  #printReport .report-meta-table td { border: 1px solid #000; padding: 4px 8px; vertical-align: top; }
+  #printReport .report-meta-table .label { font-weight: bold; background: #f0f0f0; width: 180px; }
+  #printReport .deficiency-section { margin-bottom: 24px; page-break-inside: avoid; }
+  #printReport .deficiency-section h3 { font-size: 12pt; border-bottom: 2px solid #000; padding-bottom: 4px; margin-bottom: 10px; }
+  #printReport .finding-block { margin-bottom: 16px; padding: 10px 14px; border-left: 3px solid #c0392b; background: #fafafa; }
+  #printReport .finding-block .tag-label { font-weight: bold; font-size: 11pt; color: #c0392b; margin-bottom: 4px; }
+  #printReport .finding-block p { margin: 4px 0; font-size: 10.5pt; line-height: 1.5; }
+  #printReport .plan-section { margin-top: 8px; padding-top: 8px; border-top: 1px dashed #aaa; }
+  #printReport .plan-section .plan-label { font-weight: bold; font-size: 10pt; }
+  #printReport .summary-table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 10pt; }
+  #printReport .summary-table th, #printReport .summary-table td { border: 1px solid #000; padding: 6px 10px; text-align: left; }
+  #printReport .summary-table th { background: #e8e8e8; font-weight: bold; }
+  #printReport .summary-table .fail { color: #c0392b; font-weight: bold; }
+  #printReport .summary-table .pass { color: #27ae60; }
+  #printReport .signature-block { margin-top: 40px; display: flex; justify-content: space-between; gap: 40px; }
+  #printReport .sig-line { flex: 1; border-top: 1px solid #000; padding-top: 4px; font-size: 9pt; text-align: center; }
+  #printReport .watermark { text-align: center; font-size: 8pt; color: #999; margin-top: 20px; border-top: 1px solid #ddd; padding-top: 8px; }
+</style>
+</head>
+<body>
+
+<div class="header" id="mainHeader">
+  <div class="top-label">Facility Survey Readiness Assessment</div>
+  <h1>CMS-20081 Respiratory Care</h1>
+  <div class="subtitle">Long-Term Care Survey Pathway &mdash; Interactive Checklist</div>
+  <div class="progress-bar-container"><div class="progress-bar" id="progressBar"></div></div>
+  <div class="progress-text" id="progressText">0 of 0 items completed (0%)</div>
+</div>
+
+<div class="container" id="mainApp">
+
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showSection('trigger',this)">When to Use <span class="tab-badge" id="badge-trigger">0/1</span></button>
+    <button class="nav-tab" onclick="showSection('advance',this)">Advance Review <span class="tab-badge" id="badge-advance">0/4</span></button>
+    <button class="nav-tab" onclick="showSection('observations',this)">Observations <span class="tab-badge" id="badge-observations">0/30</span></button>
+    <button class="nav-tab" onclick="showSection('resident',this)">Resident Interview <span class="tab-badge" id="badge-resident">0/4</span></button>
+    <button class="nav-tab" onclick="showSection('staff',this)">Staff Interview <span class="tab-badge" id="badge-staff">0/8</span></button>
+    <button class="nav-tab" onclick="showSection('record',this)">Record Review <span class="tab-badge" id="badge-record">0/16</span></button>
+    <button class="nav-tab" onclick="showSection('decisions',this)">Decisions <span class="tab-badge" id="badge-decisions">0/10</span></button>
+  </div>
+
+  <!-- ===== WHEN TO USE ===== -->
+  <div class="section active" id="section-trigger">
+    <div class="section-title">Use this pathway:</div>
+    <div class="card"><div class="card-body open">
+      <div class="checklist-item" data-section="trigger"><input type="checkbox" id="t1" onchange="updateProgress()"><label for="t1">For a resident who requires or receives respiratory care services (i.e., oxygen therapy, breathing exercises, sleep apnea, nebulizers/metered-dose inhalers, tracheostomy, or ventilator) to assure proper treatment and care</label></div>
+    </div></div>
+  </div>
+
+  <!-- ===== ADVANCE REVIEW ===== -->
+  <div class="section" id="section-advance">
+    <div class="section-title">Review the Following in Advance to Guide Observations and Interviews</div>
+    <div class="card"><div class="card-body open">
+      <div class="checklist-item" data-section="advance"><input type="checkbox" id="a1" onchange="updateProgress()"><label for="a1">Most current comprehensive MDS/CAAs. If most recent is quarterly, review both. Sections C, GG, J, and O.</label></div>
+      <div class="checklist-item" data-section="advance"><input type="checkbox" id="a2" onchange="updateProgress()"><label for="a2">Physician's orders (e.g., nebulizers, inhalers, tracheostomy/ventilator interventions, times, pulse oximetry parameters)</label></div>
+      <div class="checklist-item" data-section="advance"><input type="checkbox" id="a3" onchange="updateProgress()"><label for="a3">Pertinent diagnoses</label></div>
+      <div class="checklist-item" data-section="advance"><input type="checkbox" id="a4" onchange="updateProgress()"><label for="a4">Care plan (e.g., respiratory treatment/care, complications, communication, equipment functioning/cleaning, emergency procedures)</label></div>
+    </div></div>
+  </div>
+
+  <!-- ===== OBSERVATIONS ===== -->
+  <div class="section" id="section-observations">
+    <div class="section-title">Observations</div>
+
+    <div class="card">
+      <div class="card-header open" onclick="toggleCard(this)"><span class="arrow">&#9654;</span><h3>General &amp; Infection Control</h3></div>
+      <div class="card-body open">
+        <div class="checklist-item" data-section="observations"><input type="checkbox" id="o1" onchange="updateProgress()"><label for="o1">Does staff perform hand hygiene before and after respiratory care or contact with respiratory equipment?</label></div>
+        <div class="checklist-item" data-section="observations"><input type="checkbox" id="o2" onchange="updateProgress()"><label for="o2">Is appropriate PPE used during respiratory care?</label></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header" onclick="toggleCard(this)"><span class="arrow">&#9654;</span><h3>Aerosolized Care (Nebulizer / Inhaler)</h3></div>
+      <div class="card-body">
+        <div class="checklist-item" data-section="observations"><input type="checkbox" id="o3" onchange="updateProgress()"><label for="o3">Are sterile solutions (e.g., water or saline) used for nebulization?</label></div>
+        <div class="checklist-item" data-section="observations"><input type="checkbox" id="o4" onchange="updateProgress()"><label for="o4">Are single-dose vials used for only one resident?</label></div>
+        <div class="checklist-item" data-section="observations"><input type="checkbox" id="o5" onchange="updateProgress()"><label for="o5">If multi-dose vials used: is vial dated when opened, manufacturer's instructions followed for handling/storing/dispensing?</label></div>
+        <div class="checklist-item" data-section="observations"><input type="checkbox" id="o6" onchange="updateProgress()"><label for="o6">Are nebulizers cleaned per manufacturer's instructions and stored per facility policy between treatments? (If no, see F880)</label></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header" onclick="toggleCard(this)"><span class="arrow">&#9654;</span><h3>Breathing Exercises</h3></div>
+      <div class="card-body">
+        <div class="checklist-item" data-section="observations"><input type="checkbox" id="o7" onchange="updateProgress()"><label for="o7">Were breathing exercises performed as ordered (e.g., coughing/deep breathing, percussion/vibration, postural drainage)?</label></div>
+        <div class="checklist-item" data-section="observations"><input type="checkbox" id="o8" onchange="updateProgress()"><label for="o8">Does staff assess the resident's condition before and after treatments?</label></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header" onclick="toggleCard(this)"><span class="arrow">&#9654;</span><h3>Oxygen Therapy</h3></div>
+      <div class="card-body">
+        <div class="checklist-item" data-section="observations"><input type="checkbox" id="o9" onchange="updateProgress()"><label for="o9">Is oxygen being delivered as ordered by the physician?</label></div>
+        <div class="checklist-item" data-section="observations"><input type="checkbox" id="o10" onchange="updateProgress()"><label for="o10">Method correct (e.g., nasal cannula, transtracheal catheter, face mask)?</label></div>
+        <div class="checklist-item" data-section="observations"><input type="checkbox" id="o11" onchange="updateProgress()"><label for="o11">Delivered continuously or intermittently as ordered?</label></div>
+        <div class="checklist-item" data-section="observations"><input type="checkbox" id="o12" onchange="updateProgress()"><label for="o12">Oxygen machine set at the correct liters?</label></div>
+        <div class="checklist-item" data-section="observations"><input type="checkbox" id="o13" onchange="updateProgress()"><label for="o13">Does the resident exhibit anxiety, distress, or discomfort? How does staff intervene?</label></div>
+        <div class="checklist-item" data-section="observations"><input type="checkbox" id="o14" onchange="updateProgress()"><label for="o14">What precautions are observed (e.g., proper handling of oxygen cylinders)? (F689)</label></div>
+        <div class="checklist-item" data-section="observations"><input type="checkbox" id="o15" onchange="updateProgress()"><label for="o15">Smoking facilities: Doors labeled "No Smoking" at all locations where oxygen is stored/used?</label></div>
+        <div class="checklist-item" data-section="observations"><input type="checkbox" id="o16" onchange="updateProgress()"><label for="o16">Non-smoking facilities: "No Smoking" signs posted at major entrances and oxygen storage doors?</label></div>
+        <div class="checklist-item" data-section="observations"><input type="checkbox" id="o17" onchange="updateProgress()"><label for="o17">Does staff clean and sanitize equipment, tubing, and humidifier? (If no, see F880)</label></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header" onclick="toggleCard(this)"><span class="arrow">&#9654;</span><h3>Mechanical Ventilation / Tracheostomy</h3></div>
+      <div class="card-body">
+        <div class="checklist-item" data-section="observations"><input type="checkbox" id="o18" onchange="updateProgress()"><label for="o18">Is the resident able to make needs known (writing, communication cards/boards, computer access)? (F656)</label></div>
+        <div class="checklist-item" data-section="observations"><input type="checkbox" id="o19" onchange="updateProgress()"><label for="o19">Does staff intervene when resident exhibits signs of anxiety, distress, or discomfort?</label></div>
+        <div class="checklist-item" data-section="observations"><input type="checkbox" id="o20" onchange="updateProgress()"><label for="o20">Is the resident positioned as ordered?</label></div>
+        <div class="checklist-item" data-section="observations"><input type="checkbox" id="o21" onchange="updateProgress()"><label for="o21">Does the facility perform adequate oral care on the resident?</label></div>
+        <div class="checklist-item" data-section="observations"><input type="checkbox" id="o22" onchange="updateProgress()"><label for="o22">Is respiratory equipment plugged into the correct emergency power source?</label></div>
+        <div class="checklist-item" data-section="observations"><input type="checkbox" id="o23" onchange="updateProgress()"><label for="o23">Does the facility have trach resuscitation equipment at the bedside (ambulation bag)?</label></div>
+        <div class="checklist-item" data-section="observations"><input type="checkbox" id="o24" onchange="updateProgress()"><label for="o24">Do staff respond promptly when an alarm sounds?</label></div>
+        <div class="checklist-item" data-section="observations"><input type="checkbox" id="o25" onchange="updateProgress()"><label for="o25">Is the tracheostomy site clean and free of signs of infection?</label></div>
+        <div class="checklist-item" data-section="observations"><input type="checkbox" id="o26" onchange="updateProgress()"><label for="o26">When changing trach tube: appropriate infection control, correct size, sterilized/disinfected?</label></div>
+        <div class="checklist-item" data-section="observations"><input type="checkbox" id="o27" onchange="updateProgress()"><label for="o27">Does staff respond appropriately if resident has obstructed airway or needs suctioning?</label></div>
+        <div class="checklist-item" data-section="observations"><input type="checkbox" id="o28" onchange="updateProgress()"><label for="o28">Is sterile water used to fill humidifiers? Precautions not to allow condensate to drain toward resident?</label></div>
+        <div class="checklist-item" data-section="observations"><input type="checkbox" id="o29" onchange="updateProgress()"><label for="o29">Sterile single-use open-system suction catheter used each time with sterile gloves? Sterile fluid for re-entry?</label></div>
+        <div class="checklist-item" data-section="observations"><input type="checkbox" id="o30" onchange="updateProgress()"><label for="o30">Machines/equipment maintained, cleaned with appropriate disinfectant, and stored per manufacturer's instructions?</label></div>
+        <div class="notes-area"><textarea placeholder="Observation notes..." data-note="observations-notes" onchange="saveNotes()"></textarea></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== RESIDENT INTERVIEW ===== -->
+  <div class="section" id="section-resident">
+    <div class="section-title">Resident, Resident Representative, or Family Interview</div>
+    <div class="two-col">
+      <div class="col">
+        <div class="checklist-item" data-section="resident"><input type="checkbox" id="r1" onchange="updateProgress()"><label for="r1">Are you able to access call systems and communication devices?</label></div>
+        <div class="checklist-item" data-section="resident"><input type="checkbox" id="r2" onchange="updateProgress()"><label for="r2">Does the facility involve you in decisions regarding your respiratory care? If yes, does care reflect your preferences and choices?</label></div>
+      </div>
+      <div class="col">
+        <div class="checklist-item" data-section="resident"><input type="checkbox" id="r3" onchange="updateProgress()"><label for="r3">Are your respiratory needs being met?</label></div>
+        <div class="checklist-item" data-section="resident"><input type="checkbox" id="r4" onchange="updateProgress()"><label for="r4">Have you experienced any complications? If yes, what did staff do?</label></div>
+      </div>
+    </div>
+    <div class="notes-area" style="margin-top:16px"><textarea placeholder="Resident interview notes..." data-note="resident-notes" onchange="saveNotes()"></textarea></div>
+  </div>
+
+  <!-- ===== STAFF INTERVIEW ===== -->
+  <div class="section" id="section-staff">
+    <div class="section-title">Staff Interviews (Nurse, DON, Respiratory Staff)</div>
+    <div class="two-col">
+      <div class="col">
+        <div class="checklist-item" data-section="staff"><input type="checkbox" id="s1" onchange="updateProgress()"><label for="s1">Who provides respiratory care such as suctioning, tracheostomy, ventilator and/or emergency care?</label></div>
+        <div class="checklist-item" data-section="staff"><input type="checkbox" id="s2" onchange="updateProgress()"><label for="s2">What special procedures are used to monitor respiratory status (e.g., BP, blood gases, respiratory rate, suction needs, trach care)?</label></div>
+        <div class="checklist-item" data-section="staff"><input type="checkbox" id="s3" onchange="updateProgress()"><label for="s3">Did you receive training on: oxygen administration, nebulizer treatments, tracheostomy care, suctioning?</label></div>
+        <div class="checklist-item" data-section="staff"><input type="checkbox" id="s4" onchange="updateProgress()"><label for="s4">Did you receive training on: emergency interventions and use of equipment (including storage and disposal)?</label></div>
+      </div>
+      <div class="col">
+        <div class="checklist-item" data-section="staff"><input type="checkbox" id="s5" onchange="updateProgress()"><label for="s5">When and to whom do you communicate changes in the resident's condition?</label></div>
+        <div class="checklist-item" data-section="staff"><input type="checkbox" id="s6" onchange="updateProgress()"><label for="s6">What are the procedures and availability of equipment/staff for emergency situations (decannulation, cardiac arrest, equipment malfunction, power outages)?</label></div>
+        <div class="checklist-item" data-section="staff"><input type="checkbox" id="s7" onchange="updateProgress()"><label for="s7">How do you know machines/equipment are properly working?</label></div>
+        <div class="checklist-item" data-section="staff"><input type="checkbox" id="s8" onchange="updateProgress()"><label for="s8">When and to whom do you communicate problems with respiratory equipment?</label></div>
+      </div>
+    </div>
+    <div class="notes-area" style="margin-top:16px"><textarea placeholder="Staff interview notes..." data-note="staff-notes" onchange="saveNotes()"></textarea></div>
+  </div>
+
+  <!-- ===== RECORD REVIEW ===== -->
+  <div class="section" id="section-record">
+    <div class="section-title">Record Review</div>
+    <div class="two-col">
+      <div class="col">
+        <h4 style="margin-bottom:12px;color:var(--primary)">General Record Review</h4>
+        <div class="checklist-item" data-section="record"><input type="checkbox" id="rr1" onchange="updateProgress()"><label for="rr1">Facility comprehensively assessed the resident and continues to assess/monitor respiratory status and related needs?</label></div>
+        <div class="checklist-item" data-section="record"><input type="checkbox" id="rr2" onchange="updateProgress()"><label for="rr2">Respiratory interventions used (medications, aerosol generators, chest physiotherapy, oxygen therapy, secretion clearance) and resident's response?</label></div>
+        <div class="checklist-item" data-section="record"><input type="checkbox" id="rr3" onchange="updateProgress()"><label for="rr3">Airway equipment used according to physician orders (size, type, cuffed/uncuffed, double/single cannula)?</label></div>
+        <div class="checklist-item" data-section="record"><input type="checkbox" id="rr4" onchange="updateProgress()"><label for="rr4">Care provided for: artificial airway, cuff inflation (conditions for inflation/deflation)?</label></div>
+        <div class="checklist-item" data-section="record"><input type="checkbox" id="rr5" onchange="updateProgress()"><label for="rr5">Care provided for: airway cleaning, tube changes?</label></div>
+        <div class="checklist-item" data-section="record"><input type="checkbox" id="rr6" onchange="updateProgress()"><label for="rr6">Care provided for: suctioning?</label></div>
+        <div class="checklist-item" data-section="record"><input type="checkbox" id="rr7" onchange="updateProgress()"><label for="rr7">Care plan addresses respiratory needs, measurable goals, resident involvement, preferences, choices, and risk for complications?</label></div>
+        <div class="checklist-item" data-section="record"><input type="checkbox" id="rr8" onchange="updateProgress()"><label for="rr8">Has the care plan been revised to reflect any changes?</label></div>
+      </div>
+      <div class="col">
+        <h4 style="margin-bottom:12px;color:var(--primary)">Therapist &amp; Ventilator Records</h4>
+        <div class="checklist-item" data-section="record"><input type="checkbox" id="rr9" onchange="updateProgress()"><label for="rr9">If respiratory therapist provides services: evidence they are qualified with training and competencies?</label></div>
+        <div class="checklist-item" data-section="record"><input type="checkbox" id="rr10" onchange="updateProgress()"><label for="rr10">If respiratory therapist wrote orders: evidence physician delegated and supervises?</label></div>
+        <div class="checklist-item" data-section="record"><input type="checkbox" id="rr11" onchange="updateProgress()"><label for="rr11">For mechanical ventilation: physician ordered ventilator details (times on/off, rate of oxygen, mode, exhaled volume limits, pressure ranges)?</label></div>
+        <div class="checklist-item" data-section="record"><input type="checkbox" id="rr12" onchange="updateProgress()"><label for="rr12">Preset tidal volume, frequency of ventilator breaths, PEEP level?</label></div>
+        <div class="checklist-item" data-section="record"><input type="checkbox" id="rr13" onchange="updateProgress()"><label for="rr13">Humidification and temperature of inspired gases?</label></div>
+        <div class="checklist-item" data-section="record"><input type="checkbox" id="rr14" onchange="updateProgress()"><label for="rr14">Changes related to activity level (exercise or sleep)?</label></div>
+        <div class="checklist-item" data-section="record"><input type="checkbox" id="rr15" onchange="updateProgress()"><label for="rr15">Use of ventilator settings according to physician orders?</label></div>
+        <div class="checklist-item" data-section="record"><input type="checkbox" id="rr16" onchange="updateProgress()"><label for="rr16">Routine machine maintenance and care completed (water/tubing changes, safety checks on alarms, machine functioning checks)?</label></div>
+      </div>
+    </div>
+    <div class="notes-area" style="margin-top:16px"><textarea placeholder="Record review notes..." data-note="record-notes" onchange="saveNotes()"></textarea></div>
+  </div>
+
+  <!-- ===== DECISIONS ===== -->
+  <div class="section" id="section-decisions">
+    <div class="section-title">Critical Element Decisions</div>
+
+    <div class="decision-block" data-decision="d1">
+      <div class="question">1. Did the facility provide specialized care needs for respiratory care including tracheostomy care and tracheal suctioning, in accordance with professional standards of practice, and the resident's care plan, goals, and preferences?</div>
+      <div class="decision-buttons"><button class="decision-btn yes" onclick="setDecision('d1','yes')">Yes</button><button class="decision-btn no" onclick="setDecision('d1','no')">No</button></div>
+      <div class="citation" id="cite-d1">&#9888; Cite F695</div>
+      <div class="notes-area"><textarea placeholder="Findings / evidence..." data-note="d1-notes" onchange="saveNotes()"></textarea></div>
+    </div>
+
+    <div class="decision-block" data-decision="d2">
+      <div class="question">2. Did the facility ensure the therapist(s) providing respiratory services was qualified, had training, and competencies to provide the service?</div>
+      <div class="decision-buttons"><button class="decision-btn yes" onclick="setDecision('d2','yes')">Yes</button><button class="decision-btn no" onclick="setDecision('d2','no')">No</button><button class="decision-btn na" onclick="setDecision('d2','na')">N/A</button></div>
+      <div class="citation" id="cite-d2">&#9888; Cite F826</div>
+      <div class="na-note" id="na-d2">N/A: No concerns were identified, or respiratory services were not provided by a respiratory therapist(s).</div>
+      <div class="notes-area"><textarea placeholder="Findings / evidence..." data-note="d2-notes" onchange="saveNotes()"></textarea></div>
+    </div>
+
+    <div class="decision-block" data-decision="d3">
+      <div class="question">3. Did the resident's physician delegate the task of writing respiratory therapy orders to a qualified respiratory therapist, and provide supervision?</div>
+      <div class="decision-buttons"><button class="decision-btn yes" onclick="setDecision('d3','yes')">Yes</button><button class="decision-btn no" onclick="setDecision('d3','no')">No</button><button class="decision-btn na" onclick="setDecision('d3','na')">N/A</button></div>
+      <div class="citation" id="cite-d3">&#9888; Cite F715</div>
+      <div class="na-note" id="na-d3">N/A: The respiratory therapist did not write respiratory orders.</div>
+      <div class="notes-area"><textarea placeholder="Findings / evidence..." data-note="d3-notes" onchange="saveNotes()"></textarea></div>
+    </div>
+
+    <div class="decision-block" data-decision="d4">
+      <div class="question">4. Did staff use appropriate infection control practices, such as hand hygiene and PPE when providing tracheostomy and/or ventilation care, and/or during high-contact care activities?</div>
+      <div class="decision-buttons"><button class="decision-btn yes" onclick="setDecision('d4','yes')">Yes</button><button class="decision-btn no" onclick="setDecision('d4','no')">No</button></div>
+      <div class="citation" id="cite-d4">&#9888; Cite F880</div>
+      <div class="notes-area"><textarea placeholder="Findings / evidence..." data-note="d4-notes" onchange="saveNotes()"></textarea></div>
+    </div>
+
+    <hr style="margin:24px 0;border:none;border-top:2px solid var(--border)">
+
+    <div class="decision-block" data-decision="d5">
+      <div class="question">5. For newly admitted residents: baseline care plan within 48 hours with written summary the resident could understand?</div>
+      <div class="decision-buttons"><button class="decision-btn yes" onclick="setDecision('d5','yes')">Yes</button><button class="decision-btn no" onclick="setDecision('d5','no')">No</button><button class="decision-btn na" onclick="setDecision('d5','na')">N/A</button></div>
+      <div class="citation" id="cite-d5">&#9888; Cite F655</div>
+      <div class="na-note" id="na-d5">N/A: No admission since previous survey OR care/service not necessary in baseline care plan.</div>
+      <div class="notes-area"><textarea placeholder="Findings / evidence..." data-note="d5-notes" onchange="saveNotes()"></textarea></div>
+    </div>
+
+    <div class="decision-block" data-decision="d6">
+      <div class="question">6. Comprehensive assessment of physical, mental, and psychosocial needs when condition/risks were present?</div>
+      <div class="decision-buttons"><button class="decision-btn yes" onclick="setDecision('d6','yes')">Yes</button><button class="decision-btn no" onclick="setDecision('d6','no')">No</button><button class="decision-btn na" onclick="setDecision('d6','na')">N/A</button></div>
+      <div class="citation" id="cite-d6">&#9888; Cite F636</div>
+      <div class="na-note" id="na-d6">N/A: Condition/risks identified after assessment and didn't meet criteria for significant change MDS, or recently admitted and assessment not yet required.</div>
+      <div class="notes-area"><textarea placeholder="Findings / evidence..." data-note="d6-notes" onchange="saveNotes()"></textarea></div>
+    </div>
+
+    <div class="decision-block" data-decision="d7">
+      <div class="question">7. Significant change assessment completed within 14 days of determining status change was significant?</div>
+      <div class="decision-buttons"><button class="decision-btn yes" onclick="setDecision('d7','yes')">Yes</button><button class="decision-btn no" onclick="setDecision('d7','no')">No</button><button class="decision-btn na" onclick="setDecision('d7','na')">N/A</button></div>
+      <div class="citation" id="cite-d7">&#9888; Cite F637</div>
+      <div class="na-note" id="na-d7">N/A: Initial comprehensive assessment not yet completed OR no significant change in status.</div>
+      <div class="notes-area"><textarea placeholder="Findings / evidence..." data-note="d7-notes" onchange="saveNotes()"></textarea></div>
+    </div>
+
+    <div class="decision-block" data-decision="d8">
+      <div class="question">8. Does the most recent resident assessment accurately reflect the resident's status?</div>
+      <div class="decision-buttons"><button class="decision-btn yes" onclick="setDecision('d8','yes')">Yes</button><button class="decision-btn no" onclick="setDecision('d8','no')">No</button></div>
+      <div class="citation" id="cite-d8">&#9888; Cite F641</div>
+      <div class="notes-area"><textarea placeholder="Findings / evidence..." data-note="d8-notes" onchange="saveNotes()"></textarea></div>
+    </div>
+
+    <div class="decision-block" data-decision="d9">
+      <div class="question">9. Did the facility develop and implement a comprehensive person-centered care plan with measurable objectives, timeframes, goals, and preferences?</div>
+      <div class="decision-buttons"><button class="decision-btn yes" onclick="setDecision('d9','yes')">Yes</button><button class="decision-btn no" onclick="setDecision('d9','no')">No</button><button class="decision-btn na" onclick="setDecision('d9','na')">N/A</button></div>
+      <div class="citation" id="cite-d9">&#9888; Cite F656</div>
+      <div class="na-note" id="na-d9">N/A: Comprehensive assessment was not completed.</div>
+      <div class="notes-area"><textarea placeholder="Findings / evidence..." data-note="d9-notes" onchange="saveNotes()"></textarea></div>
+    </div>
+
+    <div class="decision-block" data-decision="d10">
+      <div class="question">10. Did the facility reassess the effectiveness of interventions and review/revise the care plan (with resident input) as necessary?</div>
+      <div class="decision-buttons"><button class="decision-btn yes" onclick="setDecision('d10','yes')">Yes</button><button class="decision-btn no" onclick="setDecision('d10','no')">No</button><button class="decision-btn na" onclick="setDecision('d10','na')">N/A</button></div>
+      <div class="citation" id="cite-d10">&#9888; Cite F657</div>
+      <div class="na-note" id="na-d10">N/A: Comprehensive assessment not completed OR care plan not developed OR care plan did not have to be revised.</div>
+      <div class="notes-area"><textarea placeholder="Findings / evidence..." data-note="d10-notes" onchange="saveNotes()"></textarea></div>
+    </div>
+
+    <hr style="margin:24px 0;border:none;border-top:2px solid var(--border)">
+    <div class="info-box"><strong>Other Tags/Care Areas:</strong> Dignity (CA), Right to be Informed F552, Notification of Change F580, Physician Delegation to Therapist F715, Accommodations of Needs (Environment Task), Choices (CA), Right to Refuse F578, Pressure Ulcer (CA), Nutrition (CA), Hydration (CA), Sufficient and Competent Staffing (Task), Rehab Services F826, Facility Assessment F838, Medical Director F841, QAA/QAPI (Task), Equipment Maintenance F908, Free of Accident Hazards F689, Smoking Policies F926.</div>
+  </div>
+
+</div><!-- /container -->
+
+<!-- FLOATING ACTIONS -->
+<div class="floating-actions no-print">
+  <button class="fab reset" onclick="resetAll()">Reset</button>
+  <button class="fab export" onclick="exportSummary()">Export</button>
+  <button class="fab report" onclick="openReportModal()">&#9888; Generate Report</button>
+  <button class="fab save" onclick="saveState()">Save</button>
+</div>
+<div class="toast no-print" id="toast"></div>
+
+<!-- REPORT MODAL -->
+<div class="modal-overlay" id="reportModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>&#9888; Generate Readiness Assessment Report</h2>
+      <button class="modal-close" onclick="closeReportModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="info-box warning" style="margin-bottom:20px">This will generate a <strong>CMS-2567 Statement of Deficiencies</strong> report based on all "No" decisions. Complete all Critical Element Decisions before generating.</div>
+      <div id="deficiencyPreview"></div>
+      <hr style="margin:20px 0;border:none;border-top:1px solid var(--border)">
+      <h4 style="margin-bottom:14px;color:var(--primary)">Facility Information</h4>
+      <div class="form-row">
+        <div class="form-group"><label>Facility Name</label><input type="text" id="rpt-facility" placeholder="e.g., Sunrise Care Center"></div>
+        <div class="form-group"><label>Provider / Supplier / CLIA #</label><input type="text" id="rpt-provider-id" placeholder="e.g., 555123"></div>
+      </div>
+      <div class="form-group"><label>Facility Address</label><input type="text" id="rpt-address" placeholder="e.g., 123 Main St, Springfield, IL 62704"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Survey Date(s)</label><input type="text" id="rpt-survey-date" placeholder="e.g., 03/18/2026 - 03/21/2026"></div>
+        <div class="form-group"><label>Survey ID / Event ID</label><input type="text" id="rpt-survey-id" placeholder="e.g., 7H4B"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Surveyor Name</label><input type="text" id="rpt-surveyor" placeholder="e.g., Jane Smith, RN"></div>
+        <div class="form-group"><label>Surveyor Title</label><input type="text" id="rpt-surveyor-title" placeholder="e.g., Health Facilities Evaluator Nurse"></div>
+      </div>
+      <div class="form-group"><label>Resident Identifier (anonymized)</label><input type="text" id="rpt-resident" placeholder="e.g., Resident #14"></div>
+      <hr style="margin:20px 0;border:none;border-top:1px solid var(--border)">
+      <h4 style="margin-bottom:14px;color:var(--primary)">Severity &amp; Scope</h4>
+      <div class="form-row">
+        <div class="form-group"><label>Severity</label><select id="rpt-severity"><option value="">-- Select --</option><option value="1">Level 1 - Potential for minimal harm</option><option value="2">Level 2 - Minimal harm or potential for actual harm</option><option value="3">Level 3 - Actual harm that is not immediate jeopardy</option><option value="4">Level 4 - Immediate jeopardy to resident health or safety</option></select></div>
+        <div class="form-group"><label>Scope</label><select id="rpt-scope"><option value="">-- Select --</option><option value="isolated">Isolated - Affects 1 or a limited number of residents</option><option value="pattern">Pattern - Affects more than a limited number</option><option value="widespread">Widespread - Pervasive throughout the facility</option></select></div>
+      </div>
+      <div class="form-group"><label>Plan of Correction Due Date</label><input type="date" id="rpt-poc-date"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-btn ghost" onclick="closeReportModal()">Cancel</button>
+      <button class="modal-btn secondary" onclick="generateAndDownloadHTML()">&#128196; Download HTML</button>
+      <button class="modal-btn primary" onclick="generateReport()">&#128196; Preview &amp; Print Report</button>
+    </div>
+  </div>
+</div>
+
+<div id="printReport"></div>
+
+<script>
+const STORAGE_KEY = 'cms20081_state';
+
+const TAG_DB = {
+  d1: { tag:'F695', title:'Respiratory/Tracheostomy Care', regulation:'483.25(i)', requirement:'The facility must ensure that a resident who needs respiratory care, including tracheostomy care and tracheal suctioning, is provided such care, consistent with professional standards of practice, the comprehensive person-centered care plan, the residents\' goals and preferences, and 483.65.', question:'Provide specialized respiratory care including tracheostomy care and tracheal suctioning per standards of practice' },
+  d2: { tag:'F826', title:'Rehab Services - Qualified Person', regulation:'483.65', requirement:'The facility must ensure that therapist(s) providing respiratory services are qualified and have training and competencies to provide the service.', question:'Ensure respiratory therapist(s) are qualified with training and competencies' },
+  d3: { tag:'F715', title:'Physician Delegation to Therapist', regulation:'483.30(e)(4)', requirement:'The physician must delegate the task of writing respiratory therapy orders to a qualified respiratory therapist and provide supervision.', question:'Physician delegated writing of respiratory therapy orders to qualified therapist with supervision' },
+  d4: { tag:'F880', title:'Infection Prevention & Control', regulation:'483.80(a)(1)(2)(4)(e)(f)', requirement:'The facility must establish and maintain an infection prevention and control program designed to provide a safe, sanitary, and comfortable environment and to help prevent the development and transmission of communicable diseases and infections.', question:'Use appropriate infection control practices (hand hygiene, PPE) during tracheostomy/ventilation care' },
+  d5: { tag:'F655', title:'Baseline Care Plan', regulation:'483.21(a)', requirement:'The facility must develop and implement a baseline care plan for each resident within 48 hours of admission.', question:'Develop baseline care plan within 48 hours of admission with written summary' },
+  d6: { tag:'F636', title:'Comprehensive Assessment', regulation:'483.20(b)', requirement:'The facility must make a comprehensive, accurate, standardized, reproducible assessment of each resident\'s functional capacity.', question:'Comprehensively assess the resident\'s physical, mental, and psychosocial needs' },
+  d7: { tag:'F637', title:'Significant Change Assessment', regulation:'483.20(b)(2)(ii)', requirement:'The facility must conduct a comprehensive assessment within 14 days after determining a significant change in the resident\'s condition.', question:'Complete significant change assessment within 14 days' },
+  d8: { tag:'F641', title:'Accuracy of Assessment', regulation:'483.20(g)', requirement:'The assessment must accurately reflect the resident\'s status.', question:'Most recent assessment accurately reflects resident\'s status' },
+  d9: { tag:'F656', title:'Comprehensive Care Plan', regulation:'483.21(b)', requirement:'The facility must develop and implement a comprehensive person-centered care plan for each resident.', question:'Develop comprehensive person-centered care plan with measurable objectives and timeframes' },
+  d10: { tag:'F657', title:'Care Plan Revision', regulation:'483.21(b)(2)(i)', requirement:'The facility must reassess the effectiveness of the interventions and review and revise the care plan as necessary.', question:'Reassess effectiveness of interventions and revise care plan as necessary' }
+};
+
+function showSection(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('section-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+function toggleCard(header) { header.classList.toggle('open'); header.nextElementSibling.classList.toggle('open'); }
+
+function setDecision(id, value) {
+  const block = document.querySelector(`[data-decision="${id}"]`);
+  block.querySelectorAll('.decision-btn').forEach(b => b.classList.remove('selected'));
+  block.querySelector(`.decision-btn.${value}`).classList.add('selected');
+  const cite = document.getElementById('cite-' + id);
+  const naNote = document.getElementById('na-' + id);
+  if (value === 'no') { cite.classList.add('show'); if (naNote) naNote.classList.remove('show'); }
+  else if (value === 'na') { cite.classList.remove('show'); if (naNote) naNote.classList.add('show'); }
+  else { cite.classList.remove('show'); if (naNote) naNote.classList.remove('show'); }
+  updateProgress();
+}
+
+function updateProgress() {
+  document.querySelectorAll('.checklist-item').forEach(item => {
+    const cb = item.querySelector('input[type="checkbox"]');
+    if (cb) item.classList.toggle('checked', cb.checked);
+  });
+  const totalChecks = document.querySelectorAll('.checklist-item input[type="checkbox"]').length;
+  const checkedChecks = document.querySelectorAll('.checklist-item input[type="checkbox"]:checked').length;
+  const totalDecisions = document.querySelectorAll('.decision-block').length;
+  const uniqueDecisions = new Set();
+  document.querySelectorAll('.decision-btn.selected').forEach(btn => uniqueDecisions.add(btn.closest('.decision-block').dataset.decision));
+  const total = totalChecks + totalDecisions;
+  const done = checkedChecks + uniqueDecisions.size;
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+  document.getElementById('progressBar').style.width = pct + '%';
+  document.getElementById('progressText').textContent = `${done} of ${total} items completed (${pct}%)`;
+
+  const secCfg = { trigger:1, advance:4, observations:30, resident:4, staff:8, record:16 };
+  for (const [sec, cnt] of Object.entries(secCfg)) {
+    const badge = document.getElementById('badge-' + sec);
+    if (!badge) continue;
+    let d = 0;
+    document.querySelectorAll(`[data-section="${sec}"] input[type="checkbox"]:checked`).forEach(() => d++);
+    badge.textContent = `${d}/${cnt}`;
+    badge.classList.toggle('complete', d === cnt);
+  }
+  const dbadge = document.getElementById('badge-decisions');
+  if (dbadge) { dbadge.textContent = `${uniqueDecisions.size}/10`; dbadge.classList.toggle('complete', uniqueDecisions.size === 10); }
+}
+
+function getState() {
+  const state = { checkboxes: {}, decisions: {}, notes: {} };
+  document.querySelectorAll('.checklist-item input[type="checkbox"]').forEach(cb => { state.checkboxes[cb.id] = cb.checked; });
+  document.querySelectorAll('.decision-block').forEach(block => {
+    const sel = block.querySelector('.decision-btn.selected');
+    if (sel) state.decisions[block.dataset.decision] = sel.classList.contains('yes') ? 'yes' : sel.classList.contains('no') ? 'no' : 'na';
+  });
+  document.querySelectorAll('textarea[data-note]').forEach(ta => { if (ta.value.trim()) state.notes[ta.dataset.note] = ta.value; });
+  return state;
+}
+function loadState(state) {
+  if (!state) return;
+  if (state.checkboxes) for (const [id, checked] of Object.entries(state.checkboxes)) { const cb = document.getElementById(id); if (cb) cb.checked = checked; }
+  if (state.decisions) for (const [id, value] of Object.entries(state.decisions)) setDecision(id, value);
+  if (state.notes) for (const [key, value] of Object.entries(state.notes)) { const ta = document.querySelector(`textarea[data-note="${key}"]`); if (ta) ta.value = value; }
+  updateProgress();
+}
+function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(getState())); showToast('Progress saved'); }
+function saveNotes() { localStorage.setItem(STORAGE_KEY, JSON.stringify(getState())); }
+function resetAll() {
+  if (!confirm('Reset all progress? This cannot be undone.')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+  document.querySelectorAll('.decision-btn').forEach(b => b.classList.remove('selected'));
+  document.querySelectorAll('.citation').forEach(c => c.classList.remove('show'));
+  document.querySelectorAll('.na-note').forEach(n => n.classList.remove('show'));
+  document.querySelectorAll('textarea').forEach(ta => ta.value = '');
+  updateProgress(); showToast('All progress reset');
+}
+function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2000); }
+
+function exportSummary() {
+  const state = getState();
+  let text = 'CMS-20081 RESPIRATORY CARE - SURVEY SUMMARY\nGenerated: ' + new Date().toLocaleString() + '\n' + '='.repeat(50) + '\n\n';
+  const secs = [{name:'Trigger',prefix:'t',count:1},{name:'Advance Review',prefix:'a',count:4},{name:'Observations',prefix:'o',count:30},{name:'Resident Interview',prefix:'r',count:4},{name:'Staff Interview',prefix:'s',count:8},{name:'Record Review',prefix:'rr',count:16}];
+  for (const s of secs) { let d=0; for (let i=1;i<=s.count;i++) if(state.checkboxes[s.prefix+i]) d++; text+=`${s.name}: ${d}/${s.count} completed\n`; }
+  text += '\n' + '-'.repeat(50) + '\nCRITICAL ELEMENT DECISIONS:\n\n';
+  for (const [id, info] of Object.entries(TAG_DB)) {
+    const answer = state.decisions[id] || 'Not answered';
+    text += `  ${info.question}: ${answer.toUpperCase()}${answer === 'no' ? ' >>> CITE ' + info.tag : ''}\n`;
+  }
+  if (Object.keys(state.notes).length > 0) { text += '\n' + '-'.repeat(50) + '\nNOTES:\n\n'; for (const [k,v] of Object.entries(state.notes)) text += `[${k}]\n${v}\n\n`; }
+  const blob = new Blob([text], {type:'text/plain'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'CMS-20081_Survey_Summary_' + new Date().toISOString().slice(0,10) + '.txt'; a.click();
+  showToast('Summary exported');
+}
+
+// ===== REPORT =====
+function getDeficiencies() {
+  const state = getState(); const defs = [];
+  for (const [id, info] of Object.entries(TAG_DB)) { if (state.decisions[id] === 'no') defs.push({...info, id, evidence: state.notes[id+'-notes'] || ''}); }
+  return defs;
+}
+function openReportModal() {
+  const defs = getDeficiencies();
+  const preview = document.getElementById('deficiencyPreview');
+  if (defs.length === 0) {
+    preview.innerHTML = '<div class="info-box" style="background:#e8f8e8;border-left-color:#27ae60"><strong>No Deficiencies Found</strong><br>All decisions are marked "Yes" or "N/A". You can still generate a clean report.</div>';
+  } else {
+    const grouped = {};
+    for (const d of defs) { if (!grouped[d.tag]) grouped[d.tag] = {...d, items:[]}; grouped[d.tag].items.push(d); }
+    let html = `<div style="margin-bottom:12px;font-weight:600;color:var(--accent)">&#9888; ${defs.length} deficiency finding(s) across ${Object.keys(grouped).length} tag(s):</div>`;
+    for (const [tag, g] of Object.entries(grouped)) {
+      html += `<div class="deficiency-preview"><span class="tag-num">${tag}</span> &mdash; ${g.title} [${g.regulation}]<ul style="margin:6px 0 0 18px;font-size:0.85rem">`;
+      for (const item of g.items) html += `<li>${item.question}${item.evidence ? ' <em style="color:#666">(notes attached)</em>':''}</li>`;
+      html += '</ul></div>';
+    }
+    preview.innerHTML = html;
+  }
+  document.getElementById('reportModal').classList.add('show');
+}
+function closeReportModal() { document.getElementById('reportModal').classList.remove('show'); }
+function esc(str) { const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
+
+function buildReportHTML() {
+  const defs = getDeficiencies(); const state = getState();
+  const facility = document.getElementById('rpt-facility').value || '[Facility Name]';
+  const providerId = document.getElementById('rpt-provider-id').value || '[Provider #]';
+  const address = document.getElementById('rpt-address').value || '[Facility Address]';
+  const surveyDate = document.getElementById('rpt-survey-date').value || '[Survey Date]';
+  const surveyId = document.getElementById('rpt-survey-id').value || '[Event ID]';
+  const surveyor = document.getElementById('rpt-surveyor').value || '[Surveyor Name]';
+  const surveyorTitle = document.getElementById('rpt-surveyor-title').value || '[Title]';
+  const resident = document.getElementById('rpt-resident').value || '[Resident #]';
+  const sevEl = document.getElementById('rpt-severity'); const severity = sevEl.value ? sevEl.options[sevEl.selectedIndex].text : '[Not Selected]';
+  const scEl = document.getElementById('rpt-scope'); const scope = scEl.value ? scEl.options[scEl.selectedIndex].text : '[Not Selected]';
+  const pocDate = document.getElementById('rpt-poc-date').value || '[TBD]';
+  const now = new Date().toLocaleString();
+  const grouped = {};
+  for (const d of defs) { if(!grouped[d.tag]) grouped[d.tag]={...d,items:[]}; grouped[d.tag].items.push(d); }
+
+  let html = `
+    <h1>Facility Survey Readiness Assessment</h1>
+    <h2>Statement of Deficiencies and Plan of Correction</h2>
+    <p style="text-align:center;font-size:11pt;margin-bottom:16px">CMS-2567 &mdash; Respiratory Care Pathway (CMS-20081)</p>
+    <table class="report-meta-table">
+      <tr><td class="label">Facility Name</td><td colspan="3">${esc(facility)}</td></tr>
+      <tr><td class="label">Address</td><td colspan="3">${esc(address)}</td></tr>
+      <tr><td class="label">Provider / CLIA #</td><td>${esc(providerId)}</td><td class="label">Survey Completed</td><td>${esc(surveyDate)}</td></tr>
+      <tr><td class="label">Event ID</td><td>${esc(surveyId)}</td><td class="label">Surveyor</td><td>${esc(surveyor)}, ${esc(surveyorTitle)}</td></tr>
+      <tr><td class="label">Resident Identifier</td><td>${esc(resident)}</td><td class="label">Report Generated</td><td>${now}</td></tr>
+      <tr><td class="label">Severity</td><td>${esc(severity)}</td><td class="label">Scope</td><td>${esc(scope)}</td></tr>
+    </table>
+    <div class="deficiency-section"><h3>Summary of Findings</h3>
+    <table class="summary-table"><thead><tr><th>#</th><th>Critical Element</th><th>Finding</th><th>Tag</th></tr></thead><tbody>`;
+  let idx=0;
+  for (const [id,info] of Object.entries(TAG_DB)) {
+    idx++; const answer = state.decisions[id]||'Not answered';
+    const cls = answer==='no'?'fail':answer==='yes'?'pass':'';
+    const label = answer==='no'?'DEFICIENT':answer==='yes'?'MET':answer.toUpperCase();
+    html += `<tr><td>${idx}</td><td>${info.question}</td><td class="${cls}">${label}</td><td>${answer==='no'?info.tag:'&mdash;'}</td></tr>`;
+  }
+  html += '</tbody></table></div>';
+  if (defs.length > 0) {
+    html += '<div class="deficiency-section"><h3>Deficiency Details</h3>';
+    for (const [tag,g] of Object.entries(grouped)) {
+      html += `<div class="finding-block"><div class="tag-label">TAG ${tag} &mdash; ${g.title}</div>
+        <p><strong>Regulation:</strong> 42 CFR &sect;${g.regulation}</p>
+        <p><strong>Requirement:</strong> ${g.requirement}</p>
+        <p><strong>Based on survey pathway CMS-20081 Respiratory Care, the facility failed to:</strong></p><ul style="margin:6px 0 6px 20px">`;
+      for (const item of g.items) html += `<li>${item.question}</li>`;
+      html += '</ul>';
+      const evidenceItems = g.items.filter(i=>i.evidence);
+      if (evidenceItems.length > 0) { html += '<p><strong>Evidence / Surveyor Findings:</strong></p>'; for (const item of evidenceItems) html += `<p style="margin-left:16px;white-space:pre-wrap;background:#fff;padding:8px;border:1px solid #ddd;border-radius:4px">${esc(item.evidence)}</p>`; }
+      const contextNotes = [];
+      if(state.notes['observations-notes']) contextNotes.push({label:'Observation Notes',text:state.notes['observations-notes']});
+      if(state.notes['resident-notes']) contextNotes.push({label:'Resident Interview Notes',text:state.notes['resident-notes']});
+      if(state.notes['staff-notes']) contextNotes.push({label:'Staff Interview Notes',text:state.notes['staff-notes']});
+      if(state.notes['record-notes']) contextNotes.push({label:'Record Review Notes',text:state.notes['record-notes']});
+      if(contextNotes.length>0) { html+='<p><strong>Supporting Documentation:</strong></p>'; for(const cn of contextNotes) html+=`<p style="margin-left:16px"><em>${cn.label}:</em><br><span style="white-space:pre-wrap;font-size:10pt">${esc(cn.text)}</span></p>`; }
+      html += `<div class="plan-section"><p class="plan-label">PLAN OF CORRECTION</p><p style="color:#888;font-style:italic">To be completed by facility. Due date: ${esc(pocDate)}</p><p style="min-height:60px;border:1px dashed #ccc;padding:8px;margin-top:4px;border-radius:4px">&nbsp;</p></div></div>`;
+    }
+    html += '</div>';
+  } else {
+    html += '<div class="deficiency-section"><h3>Findings</h3><p style="padding:16px;background:#e8f8e8;border-radius:8px;text-align:center;font-weight:600;color:#27ae60">No deficiencies identified. The facility met all critical elements reviewed under the Respiratory Care pathway.</p></div>';
+  }
+  html += `<div class="signature-block"><div class="sig-line">Surveyor Signature / Date</div><div class="sig-line">Facility Administrator Signature / Date</div></div>
+    <div class="watermark">Generated from CMS-20081 Respiratory Care Interactive Survey Pathway &bull; ${now}</div>`;
+  return html;
+}
+
+function generateReport() {
+  const r = document.getElementById('printReport'); r.innerHTML = buildReportHTML(); r.classList.add('visible');
+  closeReportModal();
+  document.getElementById('mainHeader').style.display='none'; document.getElementById('mainApp').style.display='none';
+  document.querySelector('.floating-actions').innerHTML = `
+    <button class="fab reset" onclick="backToSurvey()">&#8592; Back to Survey</button>
+    <button class="fab export" onclick="window.print()">&#128424; Print / PDF</button>
+    <button class="fab secondary" style="background:var(--primary);color:white;border:none;padding:12px 20px;border-radius:25px;font-size:0.85rem;font-weight:600;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.15)" onclick="downloadReportHTML()">&#128196; Download HTML</button>`;
+  window.scrollTo(0,0);
+}
+function backToSurvey() {
+  document.getElementById('printReport').classList.remove('visible'); document.getElementById('printReport').innerHTML='';
+  document.getElementById('mainHeader').style.display=''; document.getElementById('mainApp').style.display='';
+  document.querySelector('.floating-actions').innerHTML = `
+    <button class="fab reset" onclick="resetAll()">Reset</button>
+    <button class="fab export" onclick="exportSummary()">Export</button>
+    <button class="fab report" onclick="openReportModal()">&#9888; Generate Report</button>
+    <button class="fab save" onclick="saveState()">Save</button>`;
+}
+function generateAndDownloadHTML() { downloadReportHTML(); closeReportModal(); }
+function downloadReportHTML() {
+  const content = buildReportHTML();
+  const full = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Facility Survey Readiness Assessment - CMS-2567 Respiratory Care</title>
+<style>body{font-family:"Times New Roman",Times,serif;font-size:11pt;color:#000;max-width:850px;margin:30px auto;padding:20px}h1{text-align:center;font-size:14pt;margin-bottom:2px;text-transform:uppercase}h2{text-align:center;font-size:12pt;margin-bottom:16px;font-weight:normal}.report-meta-table{width:100%;border-collapse:collapse;margin-bottom:20px;font-size:10pt}.report-meta-table td{border:1px solid #000;padding:4px 8px;vertical-align:top}.report-meta-table .label{font-weight:bold;background:#f0f0f0;width:180px}.deficiency-section{margin-bottom:24px;page-break-inside:avoid}.deficiency-section h3{font-size:12pt;border-bottom:2px solid #000;padding-bottom:4px;margin-bottom:10px}.finding-block{margin-bottom:16px;padding:10px 14px;border-left:3px solid #c0392b;background:#fafafa}.finding-block .tag-label{font-weight:bold;font-size:11pt;color:#c0392b;margin-bottom:4px}.finding-block p{margin:4px 0;font-size:10.5pt;line-height:1.5}.plan-section{margin-top:8px;padding-top:8px;border-top:1px dashed #aaa}.plan-section .plan-label{font-weight:bold;font-size:10pt}.summary-table{width:100%;border-collapse:collapse;margin:12px 0;font-size:10pt}.summary-table th,.summary-table td{border:1px solid #000;padding:6px 10px;text-align:left}.summary-table th{background:#e8e8e8;font-weight:bold}.summary-table .fail{color:#c0392b;font-weight:bold}.summary-table .pass{color:#27ae60}.signature-block{margin-top:40px;display:flex;justify-content:space-between;gap:40px}.sig-line{flex:1;border-top:1px solid #000;padding-top:4px;font-size:9pt;text-align:center}.watermark{text-align:center;font-size:8pt;color:#999;margin-top:20px;border-top:1px solid #ddd;padding-top:8px}@media print{body{margin:0;padding:15px}}</style></head><body>${content}</body></html>
